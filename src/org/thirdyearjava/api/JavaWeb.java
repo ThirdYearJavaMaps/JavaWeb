@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import java.security.*;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
+import javax.sql.DataSource;
 import org.json.JSONObject;
 
 import java.sql.*;
