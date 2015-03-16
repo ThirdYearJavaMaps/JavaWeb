@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="JavaMapsV1">
+    <wb-module deploy-name="JavaWeb">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/lib"/>
         <property name="context-root" value="JavaMaps"/>
-        <property name="java-output-path" value="/JavaMapsV1/build/classes"/>
+        <property name="java-output-path" value="/JavaWeb/build/classes"/>
     </wb-module>
 </project-modules>
