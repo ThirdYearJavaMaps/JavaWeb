@@ -8,7 +8,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-<form action="Maps" method="get">
+<form action="maps" method="get">
 
 <input type="submit" value="Send">
 </form>
