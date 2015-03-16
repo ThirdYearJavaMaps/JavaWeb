@@ -9,7 +9,7 @@
 </head>
 <body>
 <form action="maps" method="get">
-
+<input type="text" />
 <input type="submit" value="Send">
 </form>
 </body>
