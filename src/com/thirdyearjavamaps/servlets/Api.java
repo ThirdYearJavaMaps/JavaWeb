@@ -7,7 +7,13 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -20,9 +26,11 @@ import javax.servlet.http.HttpSession;
 
 import javax.sql.DataSource;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.thirdyearjavamaps.classes.*;
+
 /**
  * Servlet implementation class Api
  */
@@ -101,9 +109,20 @@ public class Api extends HttpServlet {
 				if (user != null) {
 					ArrayList<String> str = new ArrayList<String>();
 					str.add(String.valueOf(user.getID()));
-					History history = (History) select_query("getHistory", str);
+					List history = (List) select_query("getHistory", str);
 					if (history != null) {
-
+						JSONArray jarr=new JSONArray();
+						for(Object dict: history){
+						    Iterator it = ((Map)dict).entrySet().iterator();
+						    JSONObject jobj=new JSONObject();
+						    while (it.hasNext()) {
+						        Map.Entry pair = (Map.Entry)it.next();
+						        jobj.put((String) pair.getKey(),pair.getValue());
+						        it.remove(); // avoids a ConcurrentModificationException
+						    }
+						    jarr.put(jobj);
+						}
+						json.put("data",jarr);
 					}
 					json.put("result", "success");
 				} else {
@@ -166,11 +185,8 @@ public class Api extends HttpServlet {
 		if (q.equals("getUser"))
 			query = "SELECT * FROM Users WHERE email=? AND password=?";
 		else if (q.equals("getHistory"))
-			query = "SELECT city,address,rooms,price FROM Apartments,History WHERE deleted=0 AND id=apartment_id AND user_id=?"; // add
-																																	// 1st
-																																	// picture
-																																	// to
-																																	// query
+			query = "SELECT city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=0 AND id=History.apartment_id AND id=pic.apartment_id AND Apartments.user_id=?";
+
 		stmt = c.prepareStatement(query);
 		for (int i = 1; i < str.size() + 1; i++)
 			stmt.setString(i, str.get(i - 1));
@@ -178,22 +194,44 @@ public class Api extends HttpServlet {
 		if (!res.isBeforeFirst()) {
 			return null;
 		}
-		User user = new User();
-		while (res.next()) {
-			user.setID(res.getInt("id"));
-			user.setFname(res.getString("fname"));
-			user.setLname(res.getString("lname"));
-			user.setEmail(res.getString("email"));
-			user.setPassword(res.getString("password"));
-			user.setPhone1(res.getString("phone1"));
-			user.setPhone2(res.getString("phone2"));
-			user.setSession(res.getString("session"));
+		Object o = null;
+		if (q.equals("getUser")) {
+			o=new User();
+			while (res.next()) {
+				((User)o).setID(res.getInt("id"));
+				((User)o).setFname(res.getString("fname"));
+				((User)o).setLname(res.getString("lname"));
+				((User)o).setEmail(res.getString("email"));
+				((User)o).setPassword(res.getString("password"));
+				((User)o).setPhone1(res.getString("phone1"));
+				((User)o).setPhone2(res.getString("phone2"));
+				((User)o).setSession(res.getString("session"));
+			}
+		} else if (q.equals("getHistory")) {
+			o=new ArrayList();
+			o=resultSetToArrayList(res);
 		}
 		res.close();
 		stmt.close();
 		c.close();
 		System.out.println("Operation done successfully");
-		return user;
+		return (Object)o;
 	}
+
+
+public List resultSetToArrayList(ResultSet rs) throws SQLException{
+	  ResultSetMetaData md = rs.getMetaData();
+	  int columns = md.getColumnCount();
+	  ArrayList list = new ArrayList();
+	  while (rs.next()){
+	     HashMap row = new HashMap(columns);
+	     for(int i=1; i<=columns; ++i){           
+	      row.put(md.getColumnName(i),rs.getObject(i));
+	     }
+	      list.add(row);
+	  }
+
+	 return list;
+}
 
 }
