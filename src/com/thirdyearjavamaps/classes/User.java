@@ -9,6 +9,7 @@ public class User {
 	private String phone1;
 	private String phone2;
 	private String session;
+	private String session_exp;
 
 	public void setID(int id) {
 		this.id = id;
@@ -25,7 +26,13 @@ public class User {
 	public String getSession() {
 		return session;
 	}
+	public void setSessionExp(String session_exp) {
+		this.session_exp = session_exp;
+	}
 
+	public String getSessionExp() {
+		return session_exp;
+	}
 	public void setFname(String fname) {
 		this.fname = fname;
 	}
@@ -73,4 +80,5 @@ public class User {
 	public String getPhone2() {
 		return phone2;
 	}
+	
 }
