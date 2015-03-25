@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -56,6 +58,7 @@ public class Api extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		String action = request.getParameter("action");
 		JSONObject json = new JSONObject();
+		DB db = new DB();
 		try {
 			if (action.equals("Login")) {
 				String email = request.getParameter("email");
@@ -63,7 +66,7 @@ public class Api extends HttpServlet {
 				ArrayList<String> str = new ArrayList<String>();
 				str.add(email);
 				str.add(password);
-				User user = (User) query("getUser", str);
+				User user = db.getUser(str);
 				if (user != null) {
 					json.put("result", "success");
 					String session_str = Generate_Session(email, password);
@@ -72,9 +75,11 @@ public class Api extends HttpServlet {
 					// bad coding - to fix
 					ArrayList<String> str1 = new ArrayList<String>();
 					str1.add(session_str);
-					str1.add(String.format("%d",epochNow()+604800)); //one week session
+					str1.add(String.format("%d", epochNow() + 604800)); // one
+																		// week
+																		// session
 					str1.add(email);
-					uquery(str1);
+					db.updateSession(str1);
 
 					HttpSession httpsession = request.getSession();
 					httpsession.setAttribute("User", user);
@@ -84,25 +89,44 @@ public class Api extends HttpServlet {
 					json.put("result", "error");
 					json.put("message", "Incorrect email and/or password.");
 				}
+			} else if (action.equals("Registration")) {
+				String[] str = { "fname", "lname", "email", "password",
+						"phone1", "phone2" };
+				List list = new ArrayList();
+				boolean stop = false;
+				for (int i = 0; i < str.length; i++) {
+					String param = request.getParameter(str[i]);
+					if (param == null) {
+						json.put("result", "error");
+						json.put("message", "Some fields are empty.");
+						stop = true;
+						break;
+					}
+					list.add(param);
+				}
+				if (!stop) {
+					db.addUser((ArrayList)list);
+					json.put("result", "success");
+				}
 			} else {
 				HttpSession httpsession = request.getSession();
 				checkSession(httpsession, request.getParameter("session"));
 				User user = (User) httpsession.getAttribute("User");
-				if (user==null || sessionExpired(user)) {
+				if (user == null || sessionExpired(user)) {
 					json.put("result", "error");
 					json.put("message", "Not logged in.");
 				} else {
-					json.put("result", "success");
-
 					if (action.equals("Main")) {
+						json.put("result", "success");
 						/*
 						 * Apartments=Algorithm();
 						 * data=Get_Apartment_Data(Apartments); json.put(data);
 						 */
 					} else if (action.equals("History")) {
+						json.put("result", "success");
 						ArrayList<String> str = new ArrayList<String>();
 						str.add(String.valueOf(user.getID()));
-						List history = (List) query("getHistory", str);
+						List history = (List) db.getHistory(str);
 						if (history != null) {
 							JSONArray jarr = new JSONArray();
 							for (Object dict : history) {
@@ -119,17 +143,43 @@ public class Api extends HttpServlet {
 							}
 							json.put("data", jarr);
 						}
+					} else {
+						throw new Exception();
 					}
 				}
 
 			}
-			response.getWriter().println(json.toString());
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			if (e.getErrorCode() == 19) {
+				try {
+					json.put("result", "error");
+					json.put("message", "Email exists.");
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
 			e.printStackTrace();
+		} catch (Exception e) {
+			try {
+				json = new JSONObject();
+				json.put("result", "error");
+				json.put("message", "Unknown error");
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		} finally {
+			try {
+				db.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			response.getWriter().println(json.toString());
 		}
 	}
 
@@ -142,18 +192,19 @@ public class Api extends HttpServlet {
 
 	}
 
-	private long epochNow(){
-		return  System.currentTimeMillis() / 1000;
+	private long epochNow() {
+		return System.currentTimeMillis() / 1000;
 	}
-	
+
 	private void checkSession(HttpSession httpsession, String session_str) {
+		DB db = new DB();
 		if (httpsession.getAttribute("User") == null) {
 			ArrayList<String> str = new ArrayList<String>();
 			str.add(session_str);
 			User user = null;
 			try {
-				user = (User) query("getUserBySession", str);
-				if(user!=null)
+				user = db.getUserBySession(str);
+				if (user != null)
 					httpsession.setAttribute("User", user);
 				else
 					System.out.println("session not found");
@@ -167,7 +218,7 @@ public class Api extends HttpServlet {
 	private boolean sessionExpired(Object o) {
 		User user = (User) o;
 		String SessionExp = user.getSessionExp();
-		if(!SessionExp.isEmpty())
+		if (!SessionExp.isEmpty())
 			return epochNow() - Long.parseLong(SessionExp) >= 0;
 		return false;
 	}
@@ -192,114 +243,6 @@ public class Api extends HttpServlet {
 			hashtext = "0" + hashtext;
 		}
 		return hashtext;
-	}
-
-	public void uquery(ArrayList<String> str) throws SQLException {
-		Connection c = null;
-		PreparedStatement stmt = null;
-		String query = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			Context ctx = new InitialContext();
-			DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/sqlite");
-			c = ds.getConnection();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (NamingException e) {
-			e.printStackTrace();
-		}
-		
-		c.setAutoCommit(false);
-		System.out.println("Opened database successfully");
-
-		query = "UPDATE Users SET session=?,session_exp=? WHERE email=?";
-
-
-		stmt = c.prepareStatement(query);
-		for (int i = 1; i < str.size() + 1; i++)
-			stmt.setString(i, str.get(i - 1));
-		stmt.executeUpdate();
-		c.commit();
-		stmt.close();
-		c.close();
-		System.out.println("Operation done successfully");
-
-	}
-	// TODO: rewrite query function.
-	public Object query(String q, ArrayList<String> str) throws SQLException {
-		Connection c = null;
-		PreparedStatement stmt = null;
-		String query = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			Context ctx = new InitialContext();
-			DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/sqlite");
-			c = ds.getConnection();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (NamingException e) {
-			e.printStackTrace();
-		}
-		
-		c.setAutoCommit(false);
-		System.out.println("Opened database successfully");
-
-		if (q.equals("getUser"))
-			query = "SELECT * FROM Users WHERE email=? AND password=?";
-		else if (q.equals("getHistory"))
-			query = "SELECT city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=0 AND id=History.apartment_id AND id=pic.apartment_id AND Apartments.user_id=?";
-		else if (q.equals("updateSession"))
-			query = "UPDATE Users SET session=?,session_exp=? WHERE email=?";
-		else if (q.equals("getUserBySession"))
-			query = "SELECT * FROM Users WHERE session=?";
-
-		stmt = c.prepareStatement(query);
-		for (int i = 1; i < str.size() + 1; i++)
-			stmt.setString(i, str.get(i - 1));
-
-		ResultSet res = stmt.executeQuery();
-		
-		Object o = null;
-			if (!res.isBeforeFirst()) {
-				return null;
-			}
-			if (q.equals("getUser") || q.equals("getUserBySession")) {
-				o = new User();
-				while (res.next()) {
-					((User) o).setID(res.getInt("id"));
-					((User) o).setFname(res.getString("fname"));
-					((User) o).setLname(res.getString("lname"));
-					((User) o).setEmail(res.getString("email"));
-					((User) o).setPassword(res.getString("password"));
-					((User) o).setPhone1(res.getString("phone1"));
-					((User) o).setPhone2(res.getString("phone2"));
-					((User) o).setSession(res.getString("session"));
-					((User) o).setSessionExp(res.getString("session_exp"));
-				}
-			} else if (q.equals("getHistory")) {
-				o = new ArrayList();
-				o = resultSetToArrayList(res);
-		}
-		res.close();
-		stmt.close();
-		c.close();
-		System.out.println("Operation done successfully");
-		return (Object) o;
-	}
-
-	public List resultSetToArrayList(ResultSet rs) throws SQLException {
-		ResultSetMetaData md = rs.getMetaData();
-		int columns = md.getColumnCount();
-		ArrayList list = new ArrayList();
-		while (rs.next()) {
-			HashMap row = new HashMap(columns);
-			for (int i = 1; i <= columns; ++i) {
-				row.put(md.getColumnName(i), rs.getObject(i));
-			}
-			list.add(row);
-		}
-
-		return list;
 	}
 
 }
