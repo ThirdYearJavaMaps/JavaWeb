@@ -105,7 +105,7 @@ public class Api extends HttpServlet {
 					list.add(param);
 				}
 				if (!stop) {
-					db.addUser((ArrayList)list);
+					db.addUser((ArrayList) list);
 					json.put("result", "success");
 				}
 			} else {
@@ -123,11 +123,10 @@ public class Api extends HttpServlet {
 						 * data=Get_Apartment_Data(Apartments); json.put(data);
 						 */
 					} else if (action.equals("History")) {
-						json.put("result", "success");
 						ArrayList<String> str = new ArrayList<String>();
 						str.add(String.valueOf(user.getID()));
 						List history = (List) db.getHistory(str);
-						if (history != null) {
+						if (history != null && history.size()>0) {
 							JSONArray jarr = new JSONArray();
 							for (Object dict : history) {
 								Iterator it = ((Map) dict).entrySet()
@@ -141,8 +140,25 @@ public class Api extends HttpServlet {
 								}
 								jarr.put(jobj);
 							}
+							json.put("result", "success");
 							json.put("data", jarr);
+						} else {
+							json.put("result", "error");
+							json.put("message", "No entries found.");
 						}
+					} else if (action.equals("removeHistory")) {
+						int aid = 0;
+						try {
+							aid = Integer.parseInt(request
+									.getParameter("apartment_id"));
+						} catch (NumberFormatException e) {
+							json.put("result", "error");
+							json.put("message", "apartment_id invalid.");
+						}
+						System.out.println(user.getID() + " " + aid);
+						db.removeHistory(user.getID(),aid);
+						json.put("result","success");
+
 					} else {
 						throw new Exception();
 					}

@@ -70,7 +70,17 @@ public class DB {
 			stmt.setString(i, str.get(i - 1));
 		stmt.executeUpdate();
 	}
-
+	
+	private void uiquery(String query, int [] ints)
+			throws SQLException {
+		c = open();
+		c.setAutoCommit(true);
+		stmt = c.prepareStatement(query);
+		for (int i = 1; i < ints.length + 1; i++)
+			stmt.setInt(i, ints[i-1]);
+		stmt.executeUpdate();
+	}
+	
 	public User getUser(ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE email=? AND password=?", str);
 		if (!res.isBeforeFirst())
@@ -137,7 +147,7 @@ public class DB {
 
 	public List getHistory(ArrayList<String> str) throws SQLException {
 		res = query(
-				"SELECT city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=0 AND id=History.apartment_id AND id=pic.apartment_id AND Apartments.user_id=?",
+				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=0 AND id=History.apartment_id AND id=pic.apartment_id AND Apartments.user_id=?",
 				str);
 		Object o = new ArrayList();
 		o = resultSetToArrayList(res);
@@ -145,10 +155,14 @@ public class DB {
 		return (List) o;
 	}
 
+	public void removeHistory(int user_id,int apartment_id) throws SQLException{
+		uiquery("UPDATE History SET deleted=1 WHERE user_id=? AND apartment_id=?",new int[]{user_id,apartment_id});
+		close();
+	}
 	public List resultSetToArrayList(ResultSet rs) throws SQLException {
 		ResultSetMetaData md = rs.getMetaData();
 		int columns = md.getColumnCount();
-		ArrayList list = new ArrayList();
+		List list = new ArrayList();
 		while (rs.next()) {
 			HashMap row = new HashMap(columns);
 			for (int i = 1; i <= columns; ++i) {
