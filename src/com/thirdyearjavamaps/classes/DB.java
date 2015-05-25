@@ -143,6 +143,7 @@ public class DB {
 		return (User) o;
 	}
 	/*st*/
+	
 	public void updateUserDetails(ArrayList<String> str) throws SQLException
 	{
 		uquery("UPDATE Users SET fname=?,lname=?,phone1=?,phone2=? WHERE email=?", str);
