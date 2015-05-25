@@ -89,11 +89,75 @@ public class Api extends HttpServlet {
 					json.put("result", "error");
 					json.put("message", "Incorrect email and/or password.");
 				}
-			} else if (action.equals("Registration")) {
-				String[] str = { "fname", "lname", "email", "password",
-						"phone1", "phone2" };
-				List list = new ArrayList();
+				
+			}
+			/*st */
+			else if(action.equals("Registration_Buyer")){
+				String[] strRB = { "name","address","latitude","longitude" };
 				boolean stop = false;
+				ArrayList<String> ArrayListRB = new ArrayList<String>();
+				for (int i = 0; i < strRB.length; i++) {
+					String param = request.getParameter(strRB[i]);
+					/*if (param == null) {
+						json.put("result", "error");
+						json.put("message", "Some fields are empty.");
+						stop = true;
+						break;
+					}*/
+
+					ArrayListRB.add(param);
+				}
+				if (!stop) {
+					//db.addLocation(ArrayListRB);
+					json.put("result", "success");
+				}
+			}
+			/*st*/
+			else if(action.equals("ChangeUserPassword"))
+			{
+				String[] strCUP = { "password","email" };
+				boolean stop = false;
+				ArrayList<String> CUP = new ArrayList<String>();
+				for (int i = 0; i < strCUP.length; i++) {
+					String param = request.getParameter(strCUP[i]);
+					if (param == null) {
+						json.put("result", "error");
+						json.put("message", "Some fields are empty.");
+						stop = true;
+						break;
+					}
+					CUP.add(param);
+				}
+			
+				if (!stop) {
+					db.updateUserPassword(CUP);
+					json.put("result", "success");
+					json.put("message", "You have successfully changed your password ");
+			
+			}
+			}
+			/*st*/
+			else if(action.equals("GetUserUsingSession"))
+			{
+				ArrayList<String> GUUS = new ArrayList<String>();
+				User GUUSUser;
+				GUUS.add(request.getParameter("session"));
+				GUUSUser=db.getUserBySession(GUUS);
+			
+				json.put("fname", GUUSUser.getFname());
+				json.put("lname", GUUSUser.getLname());
+				json.put("email", GUUSUser.getEmail());
+				json.put("password", GUUSUser.getPassword());
+				json.put("phone1", GUUSUser.getPhone1());
+				json.put("phone2", GUUSUser.getPhone2());
+				json.put("id", (GUUSUser.getID()+""));
+			}
+			/*st*/
+			else if(action.equals("UpdateUserDetails"))
+			{
+				String[] str = { "fname", "lname","phone1", "phone2","email" };
+				boolean stop = false;
+				ArrayList<String> UUD = new ArrayList<String>();				
 				for (int i = 0; i < str.length; i++) {
 					String param = request.getParameter(str[i]);
 					if (param == null) {
@@ -102,11 +166,48 @@ public class Api extends HttpServlet {
 						stop = true;
 						break;
 					}
+					UUD.add(param);
+				}
+			
+				if (!stop) {
+					db.updateUserDetails(UUD);
+					json.put("result", "success");
+					json.put("message", "You have successfully changed your details ");
+			
+			}
+			}
+			/*st*/
+			else if (action.equals("Registration")) {
+				String[] str = { "fname", "lname", "email", "password",
+						"phone1", "phone2" };
+				
+				boolean stop = false;
+				ArrayList <String> RegTest = new ArrayList<String>();
+				RegTest.add(request.getParameter("email"));
+				if(db.userExists(RegTest))
+				{
+					stop=true;
+					json.put("result", "error");
+					json.put("message", "A user with this Email is already registered");
+				}
+				List list = new ArrayList();
+				if(!stop){
+				for (int i = 0; i < str.length; i++) {
+					String param = request.getParameter(str[i]);
+					if (param == null) {
+						json.put("result", "error");
+						json.put("message", "Some fields are empty.");
+						stop = true;
+						break;
+					}
+
 					list.add(param);
 				}
+			}
 				if (!stop) {
 					db.addUser((ArrayList) list);
 					json.put("result", "success");
+					json.put("message", "You've been registered");
 				}
 			} else {
 				HttpSession httpsession = request.getSession();
@@ -207,7 +308,7 @@ public class Api extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 	}
-
+	
 	private long epochNow() {
 		return System.currentTimeMillis() / 1000;
 	}
@@ -260,5 +361,5 @@ public class Api extends HttpServlet {
 		}
 		return hashtext;
 	}
-
+	
 }

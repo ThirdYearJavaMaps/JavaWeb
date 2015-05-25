@@ -80,7 +80,16 @@ public class DB {
 			stmt.setInt(i, ints[i-1]);
 		stmt.executeUpdate();
 	}
-	
+	/*st*/
+	public boolean userExists(ArrayList<String> str) throws SQLException 
+	{
+		res = query("SELECT * FROM Users WHERE email=?", str);
+		if (!res.isBeforeFirst())
+		{
+			return false;
+		}
+		return true;
+	}
 	public User getUser(ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE email=? AND password=?", str);
 		if (!res.isBeforeFirst())
@@ -133,12 +142,30 @@ public class DB {
 		close();
 		return (User) o;
 	}
-
+	/*st*/
+	public void updateUserDetails(ArrayList<String> str) throws SQLException
+	{
+		uquery("UPDATE Users SET fname=?,lname=?,phone1=?,phone2=? WHERE email=?", str);
+		close();
+	}
+	/*st*/
+	public void updateUserPassword(ArrayList<String> str) throws SQLException
+	{
+		uquery("UPDATE Users SET password=? WHERE email=?", str);
+	close();
+		
+	}
 	public void updateSession(ArrayList<String> str) throws SQLException {
 		uquery("UPDATE Users SET session=?,session_exp=? WHERE email=?", str);
 		close();
 	}
-
+	/*st*/
+	public void addUsersLocations(ArrayList<String> str) throws SQLException
+	{
+		uquery("INSERT INTO Users_Locations (name) VALUES (?)",
+				str);
+		close();
+	}
 	public void addUser(ArrayList<String> str) throws SQLException {
 		uquery("INSERT INTO Users (fname,lname,email,password,phone1,phone2) VALUES (?,?,?,?,?,?)",
 				str);
