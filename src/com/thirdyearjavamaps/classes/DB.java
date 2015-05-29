@@ -61,6 +61,16 @@ public class DB {
 		return res;
 	}
 
+	private ResultSet query1(String query)
+			throws SQLException {
+		c = open();
+		c.setAutoCommit(false);
+		System.out.println("Opened database successfully");
+		stmt = open().prepareStatement(query);
+		res = stmt.executeQuery();
+		return res;
+	}
+	
 	private void uquery(String query, ArrayList<String> str)
 			throws SQLException {
 		c = open();
@@ -109,6 +119,7 @@ public class DB {
 		close();
 		return (User) o;
 	}
+	
 	public Admin getAdmin(ArrayList<String> str) throws SQLException{
 		res = query("SELECT * FROM Admin WHERE username=? AND password=?", str);
 		if (!res.isBeforeFirst())
@@ -142,7 +153,54 @@ public class DB {
 		close();
 		return (User) o;
 	}
+	
+	public ArrayList<User> getUsers() throws SQLException {
+		res = query1("SELECT * FROM Users");
+		ArrayList<User> users = new ArrayList<User>();
+		for(int i=0;res.next();i++) {
+			User user = new User(res.getInt("id"),res.getString("fname"),res.getString("lname"),res.getString("email"),res.getString("password"),res.getString("phone1"),res.getString("phone2"),res.getString("session"),res.getString("session_exp"));
+			users.add(user);
+		}
+		close();
+		return users;
+	}
+	
+	public ArrayList<Apartment> getApartments() throws SQLException {
+		res =query1("SELECT id,city,address,rooms,sizem2,price FROM Apartments");
+		ArrayList<Apartment> apartments = new ArrayList<Apartment>();
+		for(int i=0;res.next();i++) {
+			Apartment apartment = new Apartment(res.getInt("id"),res.getString("city"),res.getString("address"),res.getFloat("rooms"),res.getFloat("sizem2"),res.getInt("price"));
+			apartments.add(apartment);
+		}
+		close();
+		return apartments;
+	}
 	/*st*/
+	
+	public void deleteUser(int id) throws SQLException {
+		ArrayList<String> str=new ArrayList<String>();
+		str.add(Integer.toString(id));
+		uquery("DELETE FROM Users WHERE id=?",str);
+		close();
+	}
+	
+	public void deleteApartment(int id) throws SQLException {
+		ArrayList<String> str=new ArrayList<String>();
+		str.add(Integer.toString(id));
+		uquery("DELETE FROM Apartment_Picture WHERE id=?",str);
+		uquery("DELETE FROM Apartments WHERE id=?",str);
+		close();
+	}
+	
+	public User getUserByID(ArrayList<String> str) throws SQLException {
+		res = query("SELECT * FROM Users WHERE id=?",str);
+		User user=null;
+		for(int i=0;res.next();i++) {
+			user = new User(res.getInt("id"),res.getString("fname"),res.getString("lname"),res.getString("email"),res.getString("password"),res.getString("phone1"),res.getString("phone2"),res.getString("session"),res.getString("session_exp"));
+		}
+		close();
+		return user;
+	}
 	
 	public void updateUserDetails(ArrayList<String> str) throws SQLException
 	{

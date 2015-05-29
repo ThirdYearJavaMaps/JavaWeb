@@ -11,6 +11,19 @@ public class User {
 	private String session;
 	private String session_exp;
 
+	public User(int id,String fname,String lname,String email,String password,String phone1,String phone2,String session,String session_exp){
+		this.id=id;
+		this.fname=fname;
+		this.email=email;
+		this.password=password;
+		this.phone1=phone1;
+		this.phone2=phone2;
+		this.session=session;
+		this.session_exp=session_exp;
+	}
+	public User() {
+		// TODO Auto-generated constructor stub
+	}
 	public void setID(int id) {
 		this.id = id;
 	}

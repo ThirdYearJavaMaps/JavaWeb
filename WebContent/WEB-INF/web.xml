@@ -13,4 +13,5 @@
     <res-ref-name>jdbc/sqlite</res-ref-name>
     <res-type>javax.sql.DataSource</res-type>
   </resource-ref>
-</web-app>
+
+  </web-app>
