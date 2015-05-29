@@ -55,8 +55,8 @@ User user=db.getUserByID(str);
 
 <br>
 <div id="buttons" style="width:200px; margin-left: auto; margin-right: auto;">
-<input class="btn btn-primary" type="submit" value="Edit">
-<input class="btn btn-danger" type="submit" value="Delete">
+<input class="btn btn-primary" type="submit" name="action" value="Edit">
+<input class="btn btn-danger" type="submit" name="action" value="Delete">
 </div>
 </form>
 </body>

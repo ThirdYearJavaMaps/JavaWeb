@@ -207,6 +207,13 @@ public class DB {
 		uquery("UPDATE Users SET fname=?,lname=?,phone1=?,phone2=? WHERE email=?", str);
 		close();
 	}
+	
+	public void updateUser(ArrayList<String> str) throws SQLException
+	{
+		uquery("UPDATE Users SET fname=?,lname=?,email=?,password=?,phone1=?,phone2=?,session=?,session_exp=? WHERE id=?", str);
+		close();
+	}
+	
 	/*st*/
 	public void updateUserPassword(ArrayList<String> str) throws SQLException
 	{
