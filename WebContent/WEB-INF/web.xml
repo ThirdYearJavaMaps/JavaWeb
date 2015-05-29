@@ -13,5 +13,34 @@
     <res-ref-name>jdbc/sqlite</res-ref-name>
     <res-type>javax.sql.DataSource</res-type>
   </resource-ref>
+<servlet>
+    <servlet-name>JavaWeb</servlet-name>
+</servlet>
+<!--mapping-->
+<servlet-mapping>
+    <servlet-name>JavaWeb</servlet-name>
+    <url-pattern>/JavaWeb/*</url-pattern>   
+</servlet-mapping>
 
-  </web-app>
+  
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Wildcard means whole app requires authentication</web-resource-name>
+			<url-pattern>/admin/*</url-pattern>
+			<http-method>GET</http-method>
+			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>tomcat</role-name>
+		</auth-constraint>
+
+		<user-data-constraint>
+			<!-- transport-guarantee can be CONFIDENTIAL, INTEGRAL, or NONE -->
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+</web-app>

@@ -187,7 +187,7 @@ public class DB {
 	public void deleteApartment(int id) throws SQLException {
 		ArrayList<String> str=new ArrayList<String>();
 		str.add(Integer.toString(id));
-		uquery("DELETE FROM Apartment_Picture WHERE id=?",str);
+		uquery("DELETE FROM Apartment_Picture WHERE apartment_id=?",str);
 		uquery("DELETE FROM Apartments WHERE id=?",str);
 		close();
 	}

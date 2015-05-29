@@ -5,7 +5,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<link rel="stylesheet" href="../JavaWeb/css/bootstrap.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Admin control panel</title>
 </head>
@@ -13,7 +13,7 @@
 <div class="page-header">
 <h1 style="text-align: center;">Edit User</h1>
 </div>
-<form class="form-horizontal" action="${pageContext.request.contextPath}/UpdateUser.jsp" method="post" style=" width: 20%; margin-left:auto; margin-right:auto;">
+<form class="form-horizontal" action="${pageContext.request.contextPath}/admin/UpdateUser.jsp" method="post" style=" width: 20%; margin-left:auto; margin-right:auto;">
 <%
 DB db=new DB();
 String user_id=request.getParameterNames().nextElement();
