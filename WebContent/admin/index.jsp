@@ -2,5 +2,5 @@
 	pageEncoding="windows-1255"%>
 <%
 response.setStatus(response.SC_MOVED_TEMPORARILY);
-response.setHeader("Location", "Login.jsp"); 
+response.setHeader("Location", "Admin.jsp"); 
 %>
