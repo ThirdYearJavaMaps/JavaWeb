@@ -1,25 +1,12 @@
 package com.thirdyearjavamaps.servlets;
 
 import java.io.IOException;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -27,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import javax.sql.DataSource;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,59 +49,43 @@ public class Api extends HttpServlet {
 			if (action.equals("Login")) {
 				String email = request.getParameter("email");
 				String password = request.getParameter("password");
-				ArrayList<String> str = new ArrayList<String>();
-				str.add(email);
-				str.add(password);
-				User user = db.getUser(str);
-				if (user != null) {
+				User user = new User();
+				if (user.Login(email, password)) {
 					json.put("result", "success");
-					String session_str = Generate_Session(email, password);
-					user.setSession(session_str);
-
-					// bad coding - to fix
-					ArrayList<String> str1 = new ArrayList<String>();
-					str1.add(session_str);
-					str1.add(String.format("%d", epochNow() + 604800)); // one
-																		// week
-																		// session
-					str1.add(email);
-					db.updateSession(str1);
 
 					HttpSession httpsession = request.getSession();
 					httpsession.setAttribute("User", user);
 
-					json.put("session", session_str);
+					json.put("session", user.getSession());
 				} else {
 					json.put("result", "error");
 					json.put("message", "Incorrect email and/or password.");
 				}
-				
+
 			}
-			/*st */
-			else if(action.equals("Registration_Buyer")){
-				String[] strRB = { "name","address","latitude","longitude" };
+			/* st */
+			else if (action.equals("Registration_Buyer")) {
+				String[] strRB = { "name", "address", "latitude", "longitude" };
 				boolean stop = false;
 				ArrayList<String> ArrayListRB = new ArrayList<String>();
 				for (int i = 0; i < strRB.length; i++) {
 					String param = request.getParameter(strRB[i]);
-					/*if (param == null) {
-						json.put("result", "error");
-						json.put("message", "Some fields are empty.");
-						stop = true;
-						break;
-					}*/
+					/*
+					 * if (param == null) { json.put("result", "error");
+					 * json.put("message", "Some fields are empty."); stop =
+					 * true; break; }
+					 */
 
 					ArrayListRB.add(param);
 				}
 				if (!stop) {
-					//db.addLocation(ArrayListRB);
+					// db.addLocation(ArrayListRB);
 					json.put("result", "success");
 				}
 			}
-			/*st*/
-			else if(action.equals("ChangeUserPassword"))
-			{
-				String[] strCUP = { "password","email" };
+			/* st */
+			else if (action.equals("ChangeUserPassword")) {
+				String[] strCUP = { "password", "email" };
 				boolean stop = false;
 				ArrayList<String> CUP = new ArrayList<String>();
 				for (int i = 0; i < strCUP.length; i++) {
@@ -128,36 +98,35 @@ public class Api extends HttpServlet {
 					}
 					CUP.add(param);
 				}
-			
+
 				if (!stop) {
 					db.updateUserPassword(CUP);
 					json.put("result", "success");
-					json.put("message", "You have successfully changed your password ");
-			
+					json.put("message",
+							"You have successfully changed your password ");
+
+				}
 			}
-			}
-			/*st*/
-			else if(action.equals("GetUserUsingSession"))
-			{
+			/* st */
+			else if (action.equals("GetUserUsingSession")) {
 				ArrayList<String> GUUS = new ArrayList<String>();
 				User GUUSUser;
 				GUUS.add(request.getParameter("session"));
-				GUUSUser=db.getUserBySession(GUUS);
-			
+				GUUSUser = db.getUserBySession(GUUS);
+
 				json.put("fname", GUUSUser.getFname());
 				json.put("lname", GUUSUser.getLname());
 				json.put("email", GUUSUser.getEmail());
 				json.put("password", GUUSUser.getPassword());
 				json.put("phone1", GUUSUser.getPhone1());
 				json.put("phone2", GUUSUser.getPhone2());
-				json.put("id", (GUUSUser.getID()+""));
+				json.put("id", (GUUSUser.getID() + ""));
 			}
-			/*st*/
-			else if(action.equals("UpdateUserDetails"))
-			{
-				String[] str = { "fname", "lname","phone1", "phone2","email" };
+			/* st */
+			else if (action.equals("UpdateUserDetails")) {
+				String[] str = { "fname", "lname", "phone1", "phone2", "email" };
 				boolean stop = false;
-				ArrayList<String> UUD = new ArrayList<String>();				
+				ArrayList<String> UUD = new ArrayList<String>();
 				for (int i = 0; i < str.length; i++) {
 					String param = request.getParameter(str[i]);
 					if (param == null) {
@@ -168,52 +137,53 @@ public class Api extends HttpServlet {
 					}
 					UUD.add(param);
 				}
-			
+
 				if (!stop) {
 					db.updateUserDetails(UUD);
 					json.put("result", "success");
-					json.put("message", "You have successfully changed your details ");
-			
+					json.put("message",
+							"You have successfully changed your details ");
+
+				}
 			}
-			}
-			/*st*/
+			/* st */
 			else if (action.equals("Registration")) {
 				String[] str = { "fname", "lname", "email", "password",
 						"phone1", "phone2" };
-				
+
 				boolean stop = false;
-				ArrayList <String> RegTest = new ArrayList<String>();
+				ArrayList<String> RegTest = new ArrayList<String>();
 				RegTest.add(request.getParameter("email"));
-				if(db.userExists(RegTest))
-				{
-					stop=true;
+				if (db.userExists(RegTest)) {
+					stop = true;
 					json.put("result", "error");
-					json.put("message", "A user with this Email is already registered");
+					json.put("message",
+							"A user with this Email is already registered");
 				}
 				List list = new ArrayList();
-				if(!stop){
-				for (int i = 0; i < str.length; i++) {
-					String param = request.getParameter(str[i]);
-					if (param == null) {
-						json.put("result", "error");
-						json.put("message", "Some fields are empty.");
-						stop = true;
-						break;
-					}
+				if (!stop) {
+					for (int i = 0; i < str.length; i++) {
+						String param = request.getParameter(str[i]);
+						if (param == null) {
+							json.put("result", "error");
+							json.put("message", "Some fields are empty.");
+							stop = true;
+							break;
+						}
 
-					list.add(param);
+						list.add(param);
+					}
 				}
-			}
 				if (!stop) {
 					db.addUser((ArrayList) list);
 					json.put("result", "success");
 					json.put("message", "You've been registered");
 				}
-			} else {
+			} else { //USER HAVE SESSION? if so httpsession.getAttribute("User"); gets the user object with the data.
 				HttpSession httpsession = request.getSession();
 				checkSession(httpsession, request.getParameter("session"));
 				User user = (User) httpsession.getAttribute("User");
-				if (user == null || sessionExpired(user)) {
+				if (user == null || user.sessionExpired()) {
 					json.put("result", "error");
 					json.put("message", "Not logged in.");
 				} else {
@@ -224,23 +194,9 @@ public class Api extends HttpServlet {
 						 * data=Get_Apartment_Data(Apartments); json.put(data);
 						 */
 					} else if (action.equals("History")) {
-						ArrayList<String> str = new ArrayList<String>();
-						str.add(String.valueOf(user.getID()));
-						List history = (List) db.getHistory(str);
-						if (history != null && history.size()>0) {
-							JSONArray jarr = new JSONArray();
-							for (Object dict : history) {
-								Iterator it = ((Map) dict).entrySet()
-										.iterator();
-								JSONObject jobj = new JSONObject();
-								while (it.hasNext()) {
-									Map.Entry pair = (Map.Entry) it.next();
-									jobj.put((String) pair.getKey(),
-											pair.getValue());
-									it.remove();
-								}
-								jarr.put(jobj);
-							}
+						List<String> history = user.getHistoryList();
+						if (history != null && history.size() > 0) {
+							JSONArray jarr = ListToJSONArray(history);
 							json.put("result", "success");
 							json.put("data", jarr);
 						} else {
@@ -250,15 +206,14 @@ public class Api extends HttpServlet {
 					} else if (action.equals("removeHistory")) {
 						int aid = 0;
 						try {
-							aid = Integer.parseInt(request
-									.getParameter("apartment_id"));
+							aid = Integer.parseInt(request.getParameter("apartment_id"));
 						} catch (NumberFormatException e) {
 							json.put("result", "error");
 							json.put("message", "apartment_id invalid.");
 						}
 						System.out.println(user.getID() + " " + aid);
-						db.removeHistory(user.getID(),aid);
-						json.put("result","success");
+						user.removeHistory(aid);
+						json.put("result", "success");
 
 					} else {
 						throw new Exception();
@@ -308,10 +263,6 @@ public class Api extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 	}
-	
-	private long epochNow() {
-		return System.currentTimeMillis() / 1000;
-	}
 
 	private void checkSession(HttpSession httpsession, String session_str) {
 		DB db = new DB();
@@ -332,34 +283,19 @@ public class Api extends HttpServlet {
 		}
 	}
 
-	private boolean sessionExpired(Object o) {
-		User user = (User) o;
-		String SessionExp = user.getSessionExp();
-		if (!SessionExp.isEmpty())
-			return epochNow() - Long.parseLong(SessionExp) >= 0;
-		return false;
+	private JSONArray ListToJSONArray(List history) throws JSONException {
+		JSONArray jarr = new JSONArray();
+		for (Object dict : history) {
+			Iterator it = ((Map) dict).entrySet().iterator();
+			JSONObject jobj = new JSONObject();
+			while (it.hasNext()) {
+				Map.Entry pair = (Map.Entry) it.next();
+				jobj.put((String) pair.getKey(), pair.getValue());
+				it.remove();
+			}
+			jarr.put(jobj);
+		}
+		return jarr;
 	}
 
-	private String Generate_Session(String email, String password) {
-		long epoch = epochNow();
-		String plaintext = email + password + epoch;
-		System.out.println(plaintext);
-		MessageDigest m = null;
-		try {
-			m = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		m.reset();
-		m.update(plaintext.getBytes());
-		byte[] digest = m.digest();
-		BigInteger bigInt = new BigInteger(1, digest);
-		String hashtext = bigInt.toString(16);
-
-		while (hashtext.length() < 32) {
-			hashtext = "0" + hashtext;
-		}
-		return hashtext;
-	}
-	
 }

@@ -1,5 +1,12 @@
 package com.thirdyearjavamaps.classes;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
 	private int id;
 	private String fname;
@@ -11,19 +18,23 @@ public class User {
 	private String session;
 	private String session_exp;
 
-	public User(int id,String fname,String lname,String email,String password,String phone1,String phone2,String session,String session_exp){
-		this.id=id;
-		this.fname=fname;
-		this.email=email;
-		this.password=password;
-		this.phone1=phone1;
-		this.phone2=phone2;
-		this.session=session;
-		this.session_exp=session_exp;
+	public User(int id, String fname, String lname, String email,
+			String password, String phone1, String phone2, String session,
+			String session_exp) {
+		this.id = id;
+		this.fname = fname;
+		this.email = email;
+		this.password = password;
+		this.phone1 = phone1;
+		this.phone2 = phone2;
+		this.session = session;
+		this.session_exp = session_exp;
 	}
+
 	public User() {
 		// TODO Auto-generated constructor stub
 	}
+
 	public void setID(int id) {
 		this.id = id;
 	}
@@ -39,6 +50,7 @@ public class User {
 	public String getSession() {
 		return session;
 	}
+
 	public void setSessionExp(String session_exp) {
 		this.session_exp = session_exp;
 	}
@@ -46,6 +58,7 @@ public class User {
 	public String getSessionExp() {
 		return session_exp;
 	}
+
 	public void setFname(String fname) {
 		this.fname = fname;
 	}
@@ -93,5 +106,72 @@ public class User {
 	public String getPhone2() {
 		return phone2;
 	}
-	
+
+	public boolean Login(String email, String password) throws SQLException {
+		DB db = new DB();
+		ArrayList<String> str = new ArrayList<String>();
+		str.add(email);
+		str.add(password);
+		if (db.getUser(this, str)) {
+			setSession(Generate_Session());
+			updateSession();
+			return true;
+		}
+		return false;
+	}
+
+	public void updateSession() throws SQLException {
+		DB db = new DB();
+		ArrayList<String> str1 = new ArrayList<String>();
+		str1.add(session);
+		str1.add(String.format("%d", epochNow() + 604800)); // one
+															// week
+															// session
+		str1.add(email);
+		db.updateSession(str1);
+	}
+
+	private long epochNow() {
+		return System.currentTimeMillis() / 1000;
+	}
+
+	private String Generate_Session() {
+		long epoch = epochNow();
+		String plaintext = email + password + epoch;
+		System.out.println(plaintext);
+		MessageDigest m = null;
+		try {
+			m = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		m.reset();
+		m.update(plaintext.getBytes());
+		byte[] digest = m.digest();
+		BigInteger bigInt = new BigInteger(1, digest);
+		String hashtext = bigInt.toString(16);
+
+		while (hashtext.length() < 32) {
+			hashtext = "0" + hashtext;
+		}
+		return hashtext;
+	}
+
+	public boolean sessionExpired() {
+		if (session_exp.isEmpty())
+			return epochNow() - Long.parseLong(session_exp) >= 0;
+		return false;
+	}
+
+	public List<String> getHistoryList() throws SQLException {
+		DB db = new DB();
+		ArrayList<String> str = new ArrayList<String>();
+		str.add(String.valueOf(id));
+		return (List<String>) db.getHistory(str);
+	}
+
+	public void removeHistory(int apartment_id) throws SQLException {
+		DB db = new DB();
+		db.removeHistory(id, apartment_id);
+	}
 }

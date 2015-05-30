@@ -61,8 +61,7 @@ public class DB {
 		return res;
 	}
 
-	private ResultSet query1(String query)
-			throws SQLException {
+	private ResultSet query1(String query) throws SQLException {
 		c = open();
 		c.setAutoCommit(false);
 		System.out.println("Opened database successfully");
@@ -70,7 +69,7 @@ public class DB {
 		res = stmt.executeQuery();
 		return res;
 	}
-	
+
 	private void uquery(String query, ArrayList<String> str)
 			throws SQLException {
 		c = open();
@@ -80,31 +79,29 @@ public class DB {
 			stmt.setString(i, str.get(i - 1));
 		stmt.executeUpdate();
 	}
-	
-	private void uiquery(String query, int [] ints)
-			throws SQLException {
+
+	private void uiquery(String query, int[] ints) throws SQLException {
 		c = open();
 		c.setAutoCommit(true);
 		stmt = c.prepareStatement(query);
 		for (int i = 1; i < ints.length + 1; i++)
-			stmt.setInt(i, ints[i-1]);
+			stmt.setInt(i, ints[i - 1]);
 		stmt.executeUpdate();
 	}
-	/*st*/
-	public boolean userExists(ArrayList<String> str) throws SQLException 
-	{
+
+	/* st */
+	public boolean userExists(ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE email=?", str);
-		if (!res.isBeforeFirst())
-		{
+		if (!res.isBeforeFirst()) {
 			return false;
 		}
 		return true;
 	}
-	public User getUser(ArrayList<String> str) throws SQLException {
+
+	public boolean getUser(Object o, ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE email=? AND password=?", str);
 		if (!res.isBeforeFirst())
-			return null;
-		Object o = new User();
+			return false;
 		while (res.next()) {
 			((User) o).setID(res.getInt("id"));
 			((User) o).setFname(res.getString("fname"));
@@ -117,10 +114,10 @@ public class DB {
 			((User) o).setSessionExp(res.getString("session_exp"));
 		}
 		close();
-		return (User) o;
+		return true;
 	}
-	
-	public Admin getAdmin(ArrayList<String> str) throws SQLException{
+
+	public Admin getAdmin(ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Admin WHERE username=? AND password=?", str);
 		if (!res.isBeforeFirst())
 			return null;
@@ -133,7 +130,7 @@ public class DB {
 		close();
 		return (Admin) o;
 	}
-	
+
 	public User getUserBySession(ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE session=?", str);
 		if (!res.isBeforeFirst())
@@ -153,85 +150,100 @@ public class DB {
 		close();
 		return (User) o;
 	}
-	
+
 	public ArrayList<User> getUsers() throws SQLException {
 		res = query1("SELECT * FROM Users");
 		ArrayList<User> users = new ArrayList<User>();
-		for(int i=0;res.next();i++) {
-			User user = new User(res.getInt("id"),res.getString("fname"),res.getString("lname"),res.getString("email"),res.getString("password"),res.getString("phone1"),res.getString("phone2"),res.getString("session"),res.getString("session_exp"));
+		for (int i = 0; res.next(); i++) {
+			User user = new User(res.getInt("id"), res.getString("fname"),
+					res.getString("lname"), res.getString("email"),
+					res.getString("password"), res.getString("phone1"),
+					res.getString("phone2"), res.getString("session"),
+					res.getString("session_exp"));
 			users.add(user);
 		}
 		close();
 		return users;
 	}
-	
+
 	public ArrayList<Apartment> getApartments() throws SQLException {
-		res =query1("SELECT id,city,address,rooms,sizem2,price FROM Apartments");
+		res = query1("SELECT id,city,address,rooms,sizem2,price FROM Apartments");
 		ArrayList<Apartment> apartments = new ArrayList<Apartment>();
-		for(int i=0;res.next();i++) {
-			Apartment apartment = new Apartment(res.getInt("id"),res.getString("city"),res.getString("address"),res.getFloat("rooms"),res.getFloat("sizem2"),res.getInt("price"));
+		for (int i = 0; res.next(); i++) {
+			Apartment apartment = new Apartment(res.getInt("id"),
+					res.getString("city"), res.getString("address"),
+					res.getFloat("rooms"), res.getFloat("sizem2"),
+					res.getInt("price"));
 			apartments.add(apartment);
 		}
 		close();
 		return apartments;
 	}
-	/*st*/
-	
+
+	/* st */
+
 	public void deleteUser(int id) throws SQLException {
-		ArrayList<String> str=new ArrayList<String>();
+		ArrayList<String> str = new ArrayList<String>();
 		str.add(Integer.toString(id));
-		uquery("DELETE FROM Users WHERE id=?",str);
+		res=query("SELECT id FROM Apartments WHERE user_id=?",str);
+		for (int i = 0; res.next(); i++) 
+				deleteApartment(res.getInt("id"));
+		uquery("DELETE FROM Users WHERE id=?", str);
 		close();
 	}
-	
+
 	public void deleteApartment(int id) throws SQLException {
-		ArrayList<String> str=new ArrayList<String>();
+		ArrayList<String> str = new ArrayList<String>();
 		str.add(Integer.toString(id));
-		uquery("DELETE FROM Apartment_Picture WHERE apartment_id=?",str);
-		uquery("DELETE FROM Apartments WHERE id=?",str);
+		uquery("DELETE FROM Apartment_Picture WHERE apartment_id=?", str);
+		uquery("DELETE FROM Apartments WHERE id=?", str);
 		close();
 	}
-	
+
 	public User getUserByID(ArrayList<String> str) throws SQLException {
-		res = query("SELECT * FROM Users WHERE id=?",str);
-		User user=null;
-		for(int i=0;res.next();i++) {
-			user = new User(res.getInt("id"),res.getString("fname"),res.getString("lname"),res.getString("email"),res.getString("password"),res.getString("phone1"),res.getString("phone2"),res.getString("session"),res.getString("session_exp"));
+		res = query("SELECT * FROM Users WHERE id=?", str);
+		User user = null;
+		for (int i = 0; res.next(); i++) {
+			user = new User(res.getInt("id"), res.getString("fname"),
+					res.getString("lname"), res.getString("email"),
+					res.getString("password"), res.getString("phone1"),
+					res.getString("phone2"), res.getString("session"),
+					res.getString("session_exp"));
 		}
 		close();
 		return user;
 	}
-	
-	public void updateUserDetails(ArrayList<String> str) throws SQLException
-	{
-		uquery("UPDATE Users SET fname=?,lname=?,phone1=?,phone2=? WHERE email=?", str);
+
+	public void updateUserDetails(ArrayList<String> str) throws SQLException {
+		uquery("UPDATE Users SET fname=?,lname=?,phone1=?,phone2=? WHERE email=?",
+				str);
 		close();
 	}
-	
-	public void updateUser(ArrayList<String> str) throws SQLException
-	{
-		uquery("UPDATE Users SET fname=?,lname=?,email=?,password=?,phone1=?,phone2=?,session=?,session_exp=? WHERE id=?", str);
+
+	public void updateUser(ArrayList<String> str) throws SQLException {
+		uquery("UPDATE Users SET fname=?,lname=?,email=?,password=?,phone1=?,phone2=?,session=?,session_exp=? WHERE id=?",
+				str);
 		close();
 	}
-	
-	/*st*/
-	public void updateUserPassword(ArrayList<String> str) throws SQLException
-	{
+
+	/* st */
+	public void updateUserPassword(ArrayList<String> str) throws SQLException {
 		uquery("UPDATE Users SET password=? WHERE email=?", str);
-	close();
-		
+		close();
+
 	}
+
 	public void updateSession(ArrayList<String> str) throws SQLException {
 		uquery("UPDATE Users SET session=?,session_exp=? WHERE email=?", str);
 		close();
 	}
-	/*st*/
-	public void addUsersLocations(ArrayList<String> str) throws SQLException
-	{
-		uquery("INSERT INTO Users_Locations (name) VALUES (?)",
-				str);
+
+	/* st */
+	public void addUsersLocations(ArrayList<String> str) throws SQLException {
+		uquery("INSERT INTO Users_Locations (name) VALUES (?)", str);
 		close();
 	}
+
 	public void addUser(ArrayList<String> str) throws SQLException {
 		uquery("INSERT INTO Users (fname,lname,email,password,phone1,phone2) VALUES (?,?,?,?,?,?)",
 				str);
@@ -248,10 +260,13 @@ public class DB {
 		return (List) o;
 	}
 
-	public void removeHistory(int user_id,int apartment_id) throws SQLException{
-		uiquery("UPDATE History SET deleted=1 WHERE user_id=? AND apartment_id=?",new int[]{user_id,apartment_id});
+	public void removeHistory(int user_id, int apartment_id)
+			throws SQLException {
+		uiquery("UPDATE History SET deleted=1 WHERE user_id=? AND apartment_id=?",
+				new int[] { user_id, apartment_id });
 		close();
 	}
+
 	public List resultSetToArrayList(ResultSet rs) throws SQLException {
 		ResultSetMetaData md = rs.getMetaData();
 		int columns = md.getColumnCount();
