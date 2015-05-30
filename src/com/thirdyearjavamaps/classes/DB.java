@@ -117,20 +117,6 @@ public class DB {
 		return true;
 	}
 
-	public Admin getAdmin(ArrayList<String> str) throws SQLException {
-		res = query("SELECT * FROM Admin WHERE username=? AND password=?", str);
-		if (!res.isBeforeFirst())
-			return null;
-		Object o = new Admin();
-		while (res.next()) {
-			((Admin) o).setID(res.getInt("id"));
-			((Admin) o).setUsername(res.getString("username"));
-			((Admin) o).setPassword(res.getString("password"));
-		}
-		close();
-		return (Admin) o;
-	}
-
 	public User getUserBySession(ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE session=?", str);
 		if (!res.isBeforeFirst())
