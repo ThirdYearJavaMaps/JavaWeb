@@ -63,6 +63,22 @@ public class Api extends HttpServlet {
 				}
 
 			}
+			else if(action.equals("SearchAddress")){
+				String search = request.getParameter("search");
+				ArrayList<String> str = new ArrayList<String>();
+				str.add(search);
+				
+				List<String> SearchAddress = (List<String>)db.searchAddress(str);
+				if (SearchAddress != null && SearchAddress.size() > 0) {
+					JSONArray jarr = ListToJSONArray(SearchAddress);
+					json.put("result", "success");
+					json.put("data", jarr);
+				} else {
+					json.put("result", "error");
+					json.put("message", "No entries found.");
+				}
+			}
+				
 			/* st */
 			else if (action.equals("Registration_Buyer")) {
 				String[] strRB = { "name", "address", "latitude", "longitude" };

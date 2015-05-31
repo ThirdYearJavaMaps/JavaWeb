@@ -199,6 +199,7 @@ public class DB {
 		close();
 		return user;
 	}
+	
 
 	public void updateUserDetails(ArrayList<String> str) throws SQLException {
 		uquery("UPDATE Users SET fname=?,lname=?,phone1=?,phone2=? WHERE email=?",
@@ -246,6 +247,16 @@ public class DB {
 		return (List) o;
 	}
 
+	public List searchAddress(ArrayList<String> str) throws SQLException {
+		res = query(
+				"SELECT * FROM Apartments WHERE address=?",
+				str);
+		Object o = new ArrayList();
+		o = resultSetToArrayList(res);
+		close();
+		return (List) o;
+	}
+	
 	public void removeHistory(int user_id, int apartment_id)
 			throws SQLException {
 		uiquery("UPDATE History SET deleted=1 WHERE user_id=? AND apartment_id=?",
