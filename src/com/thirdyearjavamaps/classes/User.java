@@ -188,16 +188,29 @@ public class User {
 		db.removeHistory(id, apartment_id);
 	}
 	
-	private void sendConfirmationEmail(String to){
-			String from="admin@weepi.com";
-			String subject="Weepi registration.";
-			String pass="12345";
-			String body=String.format("Thank you for registering to Weepi.\n\n Email: %s\nPassword: %s",email,password);
-	        Properties props = System.getProperties();
+	//updated by st stas and dj araksha
+	public void sendEmail(String what_action){
+			String from="gymprogramerssce@gmail.com";
+			String subject="";
+			String pass="gymprogramers1234";
+			String body="";
+			if(what_action=="confirmation")
+			{
+				subject="Weepi Registration confirmation";
+			 body=String.format("Thank you for registering to Weepi.\n\n Email: %s\nPassword: %s",email,password);
+			}
+			if(what_action=="forgotpassword")
+			{
+				subject="Weepi brings your forgotten password";
+				 body=String.format("Hi it's Weepi.\n\n Your password is: %s",password);
+			}
+			
+			Properties props = System.getProperties();
 	        String host = "smtp.gmail.com";
 	        props.put("mail.smtp.starttls.enable", "true");
 	        props.put("mail.smtp.host", host);
-	        props.put("mail.smtp.user", "register_a_user@gmail.com");
+	        
+	        props.put("mail.smtp.user", "gymprogramerssce");
 	        props.put("mail.smtp.password", pass);
 	        props.put("mail.smtp.port", "587");
 	        props.put("mail.smtp.auth", "true");
@@ -207,7 +220,7 @@ public class User {
 
 	        try {
 	            message.setFrom(new InternetAddress(from));
-	            InternetAddress toAddress = new InternetAddress();
+	            InternetAddress toAddress = new InternetAddress(this.email);
 	            message.addRecipient(Message.RecipientType.TO, toAddress);
 	            
 
