@@ -53,7 +53,7 @@ public class DB {
 		c = open();
 		c.setAutoCommit(false);
 		System.out.println("Opened database successfully");
-		stmt = open().prepareStatement(query);
+		stmt = c.prepareStatement(query);
 		for (int i = 1; i < str.size() + 1; i++)
 			stmt.setString(i, str.get(i - 1));
 
@@ -65,7 +65,7 @@ public class DB {
 		c = open();
 		c.setAutoCommit(false);
 		System.out.println("Opened database successfully");
-		stmt = open().prepareStatement(query);
+		stmt = c.prepareStatement(query);
 		res = stmt.executeQuery();
 		return res;
 	}
@@ -88,7 +88,7 @@ public class DB {
 			stmt.setInt(i, ints[i - 1]);
 		stmt.executeUpdate();
 	}
-
+	
 	/* st */
 	public boolean userExists(ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE email=?", str);
@@ -247,10 +247,13 @@ public class DB {
 		return (List) o;
 	}
 
-	public List searchAddress(ArrayList<String> str) throws SQLException {
-		res = query(
-				"SELECT * FROM Apartments WHERE address=?",
-				str);
+	public List searchAddress(String str) throws SQLException {
+		c = open();
+		c.setAutoCommit(false);
+		System.out.println("Opened database successfully");
+		stmt = c.prepareStatement("SELECT * FROM Apartments WHERE address LIKE ?");
+		stmt.setString(1, "%" + str + "%");
+		res = stmt.executeQuery();
 		Object o = new ArrayList();
 		o = resultSetToArrayList(res);
 		close();

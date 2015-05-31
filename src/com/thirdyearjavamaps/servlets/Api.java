@@ -65,10 +65,8 @@ public class Api extends HttpServlet {
 			}
 			else if(action.equals("SearchAddress")){
 				String search = request.getParameter("search");
-				ArrayList<String> str = new ArrayList<String>();
-				str.add(search);
-				
-				List<String> SearchAddress = (List<String>)db.searchAddress(str);
+				System.out.println(search);
+				List<String> SearchAddress = (List<String>)db.searchAddress(search);
 				if (SearchAddress != null && SearchAddress.size() > 0) {
 					JSONArray jarr = ListToJSONArray(SearchAddress);
 					json.put("result", "success");
