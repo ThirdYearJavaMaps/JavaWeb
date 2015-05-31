@@ -177,6 +177,25 @@ public class Api extends HttpServlet {
 
 				}
 			}
+			//st
+			else if(action.equals("ForgotPassword"))
+			{
+				
+				ArrayList ru=new ArrayList();
+				ru.add(request.getParameter("email"));
+				User registeredUser=db.getUserByEmail(ru);
+				if(registeredUser==null)
+				{
+					
+					json.put("result", "error");
+					json.put("message","No such user!");
+				}
+				else{
+				registeredUser.sendEmail("forgotpassword");
+				json.put("result", "success");
+				json.put("message", "An email with your password was sent to "+ru.get(0));
+				}
+				}
 			/* st */
 			else if (action.equals("Registration")) {
 				String[] str = { "fname", "lname", "email", "password",
@@ -207,8 +226,12 @@ public class Api extends HttpServlet {
 				}
 				if (!stop) {
 					db.addUser((ArrayList) list);
+					ArrayList ru=new ArrayList();
+					ru.add(request.getParameter("email"));
+					User registeredUser=db.getUserByEmail(ru);
+					registeredUser.sendEmail("confirmation");
 					json.put("result", "success");
-					json.put("message", "You've been registered");
+					json.put("message", "You've been registered, an email was sent to "+ru.get(0));
 				}
 			} else { //USER HAVE SESSION? if so httpsession.getAttribute("User"); gets the user object with the data.
 				HttpSession httpsession = request.getSession();
