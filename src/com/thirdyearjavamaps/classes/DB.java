@@ -97,7 +97,26 @@ public class DB {
 		}
 		return true;
 	}
-
+	/* st and ar*/
+	public User getUserByEmail(ArrayList<String> str) throws SQLException{		
+		res = query("SELECT * FROM Users WHERE email=?", str);		
+		if (res.isBeforeFirst()){
+		User o=new User();
+		while (res.next()) {
+			( o).setID(res.getInt("id"));
+			( o).setFname(res.getString("fname"));
+			( o).setLname(res.getString("lname"));
+			( o).setEmail(res.getString("email"));
+			( o).setPassword(res.getString("password"));
+			( o).setPhone1(res.getString("phone1"));
+			( o).setPhone2(res.getString("phone2"));
+			( o).setSession(res.getString("session"));
+			( o).setSessionExp(res.getString("session_exp"));
+		}
+		return o;
+	}
+	return null;
+	}
 	public boolean getUser(Object o, ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE email=? AND password=?", str);
 		if (!res.isBeforeFirst())
