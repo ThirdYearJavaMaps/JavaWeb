@@ -224,7 +224,10 @@ public class DB {
 		uquery("UPDATE Users SET session=?,session_exp=? WHERE email=?", str);
 		close();
 	}
-
+	public void  addImagetoApartment(ArrayList<String> str) throws SQLException {
+		uquery("INSERT INTO Apartment_Picture VALUES (?,?)", str);
+		close();
+	}
 	/* st */
 	public void addUsersLocations(ArrayList<String> str) throws SQLException {
 		uquery("INSERT INTO Users_Locations (name) VALUES (?)", str);

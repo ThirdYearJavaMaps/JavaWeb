@@ -140,7 +140,7 @@ public class User {
 		db.updateSession(str1);
 	}
 
-	private long epochNow() {
+	public static long epochNow() {
 		return System.currentTimeMillis() / 1000;
 	}
 
@@ -148,6 +148,10 @@ public class User {
 		long epoch = epochNow();
 		String plaintext = email + password + epoch;
 		System.out.println(plaintext);
+		return md5(plaintext);
+	}
+
+	public static String md5(String plaintext){
 		MessageDigest m = null;
 		try {
 			m = MessageDigest.getInstance("MD5");
@@ -165,7 +169,7 @@ public class User {
 		}
 		return hashtext;
 	}
-
+	
 	public boolean sessionExpired() {
 		if (session_exp.isEmpty())
 			return epochNow() - Long.parseLong(session_exp) >= 0;

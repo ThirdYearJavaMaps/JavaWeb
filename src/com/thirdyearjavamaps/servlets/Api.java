@@ -1,18 +1,34 @@
 package com.thirdyearjavamaps.servlets;
 
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tomcat.util.codec.binary.Base64;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 
 import org.json.JSONArray;
@@ -25,6 +41,7 @@ import com.thirdyearjavamaps.classes.*;
  * Servlet implementation class Api
  */
 @WebServlet("/api")
+@MultipartConfig
 public class Api extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -275,9 +292,103 @@ public class Api extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		JSONObject json_out = new JSONObject();
+		try {
+			DB db = new DB();
+			JSONObject json_in = new JSONObject();
+			String base64encoded;
+			base64encoded = json_in.getString(request.getParameter("file"));
+			Base64 base64=new Base64();
+			byte[] image=base64.decode(base64encoded);
+			
+			InputStream in = new ByteArrayInputStream(image);
+			BufferedImage bImageFromConvert = ImageIO.read(in);
+			
+			ImageWriter writer = (ImageWriter) ImageIO.getImageWritersByFormatName("jpeg").next();
+
+			ImageWriteParam param = writer.getDefaultWriteParam();
+			param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+			param.setCompressionQuality(0.2f);
+			
+			String root=null;
+			String filename=User.md5(String.valueOf(User.epochNow()))+".jpg";
+			String filepath=null;
+			File file = new File(filepath);
+			ArrayList<String> str=new ArrayList<String>();
+			str.add(request.getParameter("apartment_id"));
+			str.add(filename);
+			db.addImagetoApartment(str);
+			writer.setOutput(ImageIO.createImageOutputStream(file));
+			writer.write(null, new IIOImage(bImageFromConvert, null, null), param);
+			writer.dispose();
+			json_out.append("result", "success");
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (SQLException e){
+			try {
+				json_out.append("result", "error");
+			} catch (JSONException e1) {
+				e1.printStackTrace();
+			}
+		}
+		response.getWriter().println(json_out.toString());
+	}
+	
+	public BufferedImage scale(BufferedImage img, int targetWidth, int targetHeight) {
+
+	    int type = (img.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+	    BufferedImage ret = img;
+	    BufferedImage scratchImage = null;
+	    Graphics2D g2 = null;
+
+	    int w = img.getWidth();
+	    int h = img.getHeight();
+
+	    int prevW = w;
+	    int prevH = h;
+
+	    do {
+	        if (w > targetWidth) {
+	            w /= 2;
+	            w = (w < targetWidth) ? targetWidth : w;
+	        }
+
+	        if (h > targetHeight) {
+	            h /= 2;
+	            h = (h < targetHeight) ? targetHeight : h;
+	        }
+
+	        if (scratchImage == null) {
+	            scratchImage = new BufferedImage(w, h, type);
+	            g2 = scratchImage.createGraphics();
+	        }
+
+	        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+	                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+	        g2.drawImage(ret, 0, 0, w, h, 0, 0, prevW, prevH, null);
+
+	        prevW = w;
+	        prevH = h;
+	        ret = scratchImage;
+	    } while (w != targetWidth || h != targetHeight);
+
+	    if (g2 != null) {
+	        g2.dispose();
+	    }
+
+	    if (targetWidth != ret.getWidth() || targetHeight != ret.getHeight()) {
+	        scratchImage = new BufferedImage(targetWidth, targetHeight, type);
+	        g2 = scratchImage.createGraphics();
+	        g2.drawImage(ret, 0, 0, null);
+	        g2.dispose();
+	        ret = scratchImage;
+	    }
+
+	    return ret;
 
 	}
-
+	
 	private void checkSession(HttpSession httpsession, String session_str) {
 		DB db = new DB();
 		if (httpsession.getAttribute("User") == null) {
