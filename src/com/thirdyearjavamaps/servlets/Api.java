@@ -257,7 +257,13 @@ public class Api extends HttpServlet {
 							json.put("result", "error");
 							json.put("message", "No entries found.");
 						}
-					} else if (action.equals("removeHistory")) {
+					} 
+					else if (action.equals("addHistory")){
+						int apartment_id=Integer.parseInt(request.getParameter("apartment_id"));
+						user.addHistory(apartment_id);
+						json.put("result", "success");
+					}
+					else if (action.equals("removeHistory")) {
 						int aid = 0;
 						try {
 							aid = Integer.parseInt(request.getParameter("apartment_id"));
@@ -268,8 +274,8 @@ public class Api extends HttpServlet {
 						System.out.println(user.getID() + " " + aid);
 						user.removeHistory(aid);
 						json.put("result", "success");
-
-					} else {
+					}
+					else {
 						throw new Exception();
 					}
 				}
@@ -281,7 +287,7 @@ public class Api extends HttpServlet {
 			if (e.getErrorCode() == 19) {
 				try {
 					json.put("result", "error");
-					json.put("message", "Email exists.");
+					json.put("message", "Duplicate entry.");
 				} catch (JSONException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

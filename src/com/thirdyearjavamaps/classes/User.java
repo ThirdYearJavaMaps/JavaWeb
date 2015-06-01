@@ -182,7 +182,12 @@ public class User {
 		str.add(String.valueOf(id));
 		return (List<String>) db.getHistory(str);
 	}
-
+	
+	public void addHistory(int apartment_id) throws SQLException {
+		DB db = new DB();
+		db.addHistory(id, apartment_id, Long.toString(epochNow()));
+	}
+	
 	public void removeHistory(int apartment_id) throws SQLException {
 		DB db = new DB();
 		db.removeHistory(id, apartment_id);

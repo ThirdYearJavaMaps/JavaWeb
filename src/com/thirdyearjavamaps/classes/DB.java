@@ -93,8 +93,10 @@ public class DB {
 	public boolean userExists(ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE email=?", str);
 		if (!res.isBeforeFirst()) {
+			close();
 			return false;
 		}
+		close();
 		return true;
 	}
 	/* st and ar*/
@@ -113,14 +115,19 @@ public class DB {
 			( o).setSession(res.getString("session"));
 			( o).setSessionExp(res.getString("session_exp"));
 		}
+		close();
 		return o;
 	}
+	close();
 	return null;
 	}
+	
 	public boolean getUser(Object o, ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE email=? AND password=?", str);
-		if (!res.isBeforeFirst())
+		if (!res.isBeforeFirst()){
+			close();
 			return false;
+		}
 		while (res.next()) {
 			((User) o).setID(res.getInt("id"));
 			((User) o).setFname(res.getString("fname"));
@@ -138,8 +145,10 @@ public class DB {
 
 	public User getUserBySession(ArrayList<String> str) throws SQLException {
 		res = query("SELECT * FROM Users WHERE session=?", str);
-		if (!res.isBeforeFirst())
+		if (!res.isBeforeFirst()){
+			close();
 			return null;
+		}
 		Object o = new User();
 		while (res.next()) {
 			((User) o).setID(res.getInt("id"));
@@ -258,7 +267,20 @@ public class DB {
 				str);
 		close();
 	}
-
+	
+	public void addHistory(int user_id,int apartment_id,String date) throws SQLException {
+		c = open();
+		c.setAutoCommit(true);
+		System.out.println("Opened database successfully");
+		stmt = c.prepareStatement("INSERT INTO History VALUES (?,?,?,?)");
+		stmt.setInt(1,user_id);
+		stmt.setInt(2,apartment_id);
+		stmt.setInt(3,0);
+		stmt.setString(4,date);
+		stmt.executeUpdate();
+		close();
+	}
+	
 	public List getHistory(ArrayList<String> str) throws SQLException {
 		res = query(
 				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=0 AND id=History.apartment_id AND id=pic.apartment_id AND Apartments.user_id=?",
