@@ -329,7 +329,7 @@ public class DB {
 
 	public List getHistory(ArrayList<String> str) throws SQLException {
 		res = query(
-				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE id=History.apartment_id AND id=pic.apartment_id AND Apartments.user_id=?",
+				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE id=History.apartment_id AND id=pic.apartment_id AND History.user_id=?",
 				str);
 		Object o = new ArrayList();
 		o = resultSetToArrayList(res);
@@ -373,7 +373,7 @@ public class DB {
 	}
 	public List<String> getHistoryLiked(ArrayList<String> str) throws SQLException{
 		res = query(
-				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=0 AND id=History.apartment_id AND id=pic.apartment_id AND Apartments.user_id=?",
+				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=0 AND id=History.apartment_id AND id=pic.apartment_id AND History.user_id=?",
 				str);
 		Object o = new ArrayList();
 		o = resultSetToArrayList(res);
