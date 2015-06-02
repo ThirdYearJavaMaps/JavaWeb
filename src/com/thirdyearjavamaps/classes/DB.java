@@ -193,6 +193,34 @@ public class DB {
 		close();
 		return apartments;
 	}
+	
+	/*Ariel, function for search*/
+	
+	public ArrayList<Apartment> getSearchedApartments(ArrayList<String> str) throws SQLException {
+		res = query("SELECT * FROM Apartments"
+				+ "WHERE city=?"
+				+ "AND (rooms=?"
+				+ "OR (price<=? AND price>=?)"
+				+ "OR (floor<=? AND floor>=?))",str);
+		if (!res.isBeforeFirst()){
+			close();
+			return null;
+		}
+		ArrayList<Apartment> apartments = new ArrayList<Apartment>();
+		for (int i = 0; res.next(); i++) {
+			Apartment apartment = new Apartment(res.getInt("id"),
+					res.getString("city"), res.getString("address"),
+					res.getFloat("rooms"), res.getInt("floor"),
+					res.getInt("price"),res.getBoolean("aircondition"),
+					res.getBoolean("elevator"),res.getBoolean("balcony"),
+					res.getBoolean("isolated_room"),res.getBoolean("parking"),
+					res.getBoolean("handicap_access"),res.getBoolean("storage"),
+					res.getBoolean("sun_balcony"));
+			apartments.add(apartment);
+		}
+		close();
+		return apartments;
+	}
 
 	/* st */
 
