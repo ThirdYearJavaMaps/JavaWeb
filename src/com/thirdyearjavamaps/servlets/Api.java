@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,10 +80,83 @@ public class Api extends HttpServlet {
 				}
 
 			}
-			else if(action.equals("SearchAddress")){
+
+			else if (action.equals("AddApt")) {
+				// String[] strApt = { "city","price","territory","street",
+				// "house_num","apt_num","rooms","floor",
+				// "sizem2","desc","aircondition","elevator", "balcony",
+				// "isolated_room","parking", "handicap_access",
+				// "storage","bars","sun_balcony",
+				// "renovated","furnished","unit","pandoor"};
+
+				Map<String, String> dict = new HashMap<>();
+				dict.put("user_id", "");
+				dict.put("type_id", "");
+				dict.put("territory", "");
+				dict.put("city", "");
+				dict.put("address", "");
+				dict.put("rooms", "");
+				dict.put("floor", "");
+				dict.put("latitude", "");
+				dict.put("longitude", "");
+				dict.put("sizem2", "");
+				dict.put("comment", "");
+				dict.put("price", "");
+				dict.put("add_date", "");
+				dict.put("aircondition", "");
+				dict.put("elevator", "");
+				dict.put("balcony", "");
+				dict.put("isolated_room", "");
+				dict.put("parking", "");
+				dict.put("handicap_access", "");
+				dict.put("storage", "");
+				dict.put("bars", "");
+				dict.put("sun_balcony", "");
+				dict.put("renovated", "");
+				dict.put("furnished", "");
+				dict.put("unit", "");
+				dict.put("pandoor", "");
+				
+				for (String item : dict.keySet()) {
+					String param = request.getParameter(item);
+					dict.put(item, param);
+				}
+
+				
+				
+//				
+//				String[] strApt = { "user_id", "type_id", "territory", "city",
+//						"address", "rooms", "floor", "latitude", "longitude",
+//						"sizem2", "comment", "price", "aircondition",
+//						"elevator", "balcony", "isolated_room", "parking",
+//						"handicap_access", "storage", "bars", "sun_balcony",
+//						"renovated", "furnished", "unit", "pandoor" };
+
+				boolean stop = false;
+				//ArrayList<String> AddApt = new ArrayList<String>();
+				for (String item : dict.keySet()) {
+					//String param = request.getParameter(strApt[i]);
+					if (item == null) {
+						json.put("result", "error");
+						json.put("message", "Some fields are empty.");
+						stop = true;
+						break;
+					}
+					//AddApt.add(param);
+				}
+
+				if (!stop) {
+					db.addApt(dict);
+					json.put("result", "success");
+					json.put("message",
+							"You have successfully changed your password ");
+
+				}
+			} else if (action.equals("SearchAddress")) {
 				String search = request.getParameter("search");
 				System.out.println(search);
-				List<String> SearchAddress = (List<String>)db.searchAddress(search);
+				List<String> SearchAddress = (List<String>) db
+						.searchAddress(search);
 				if (SearchAddress != null && SearchAddress.size() > 0) {
 					JSONArray jarr = ListToJSONArray(SearchAddress);
 					json.put("result", "success");
@@ -94,54 +166,54 @@ public class Api extends HttpServlet {
 					json.put("message", "No entries found.");
 				}
 			}
-			
-			 			
- 			else if(action.equals("getApartment")){
- 				int apartment_id = Integer.parseInt(request.getParameter("apartment_id"));
- 				HashMap dict=db.getApartmentByID(apartment_id);
- 				JSONObject jobj = new JSONObject();
- 				if (dict!=null) {
- 					Iterator it = ((Map) dict).entrySet().iterator();
- 					jobj = new JSONObject();
- 					while (it.hasNext()) {
- 						Map.Entry pair = (Map.Entry) it.next();
- 						jobj.put((String) pair.getKey(), pair.getValue());
- 						it.remove();
- 					}
- 					json.put("result", "success");
- 					json.put("data", jobj);
- 				} else {
- 					json.put("result", "error");
- 				}
- 			}
- 			else if(action.equals("getUserInfo")){
- 				int user_id = Integer.parseInt(request.getParameter("user_id"));
- 				HashMap dict=db.getUserInfo(user_id);
- 				JSONObject jobj = new JSONObject();
- 				if (dict!=null) {
- 					Iterator it = ((Map) dict).entrySet().iterator();
- 					jobj = new JSONObject();
- 					while (it.hasNext()) {
- 						Map.Entry pair = (Map.Entry) it.next();
- 						jobj.put((String) pair.getKey(), pair.getValue());
- 						it.remove();
- 					}
- 					json.put("result", "success");
- 					json.put("data", jobj);
- 				} else {
- 					json.put("result", "error");
- 				}
- 			}
-	
+
+			else if (action.equals("getApartment")) {
+				int apartment_id = Integer.parseInt(request
+						.getParameter("apartment_id"));
+				HashMap dict = db.getApartmentByID(apartment_id);
+				JSONObject jobj = new JSONObject();
+				if (dict != null) {
+					Iterator it = ((Map) dict).entrySet().iterator();
+					jobj = new JSONObject();
+					while (it.hasNext()) {
+						Map.Entry pair = (Map.Entry) it.next();
+						jobj.put((String) pair.getKey(), pair.getValue());
+						it.remove();
+					}
+					json.put("result", "success");
+					json.put("data", jobj);
+				} else {
+					json.put("result", "error");
+				}
+			} else if (action.equals("getUserInfo")) {
+				int user_id = Integer.parseInt(request.getParameter("user_id"));
+				HashMap dict = db.getUserInfo(user_id);
+				JSONObject jobj = new JSONObject();
+				if (dict != null) {
+					Iterator it = ((Map) dict).entrySet().iterator();
+					jobj = new JSONObject();
+					while (it.hasNext()) {
+						Map.Entry pair = (Map.Entry) it.next();
+						jobj.put((String) pair.getKey(), pair.getValue());
+						it.remove();
+					}
+					json.put("result", "success");
+					json.put("data", jobj);
+				} else {
+					json.put("result", "error");
+				}
+			}
+
 			/* st */
 			else if (action.equals("Registration_Location")) {
-				
-				String[] strRB = { "userid","lati", "lngi", "addresstosend",  "name"};
-				
+
+				String[] strRB = { "userid", "lati", "lngi", "addresstosend",
+						"name" };
+
 				boolean stop = false;
 				ArrayList<String> ArrayListRB = new ArrayList<String>();
 				for (int i = 0; i < strRB.length; i++) {
-					
+
 					String param = request.getParameter(strRB[i]);
 					if (param == null) {
 						json.put("result", "error");
@@ -152,9 +224,9 @@ public class Api extends HttpServlet {
 					ArrayListRB.add(param);
 				}
 				if (!stop) {
-					
-					 db.addUsersLocations(ArrayListRB);
-					 
+
+					db.addUsersLocations(ArrayListRB);
+
 					json.put("result", "Location was written");
 				}
 			}
@@ -221,25 +293,25 @@ public class Api extends HttpServlet {
 
 				}
 			}
-			//st
-			else if(action.equals("ForgotPassword"))
-			{
-				
-				ArrayList ru=new ArrayList();
+			// st
+			else if (action.equals("ForgotPassword")) {
+
+				ArrayList ru = new ArrayList();
 				ru.add(request.getParameter("email"));
-				User registeredUser=db.getUserByEmail(ru);
-				if(registeredUser==null)
-				{
-					
+				User registeredUser = db.getUserByEmail(ru);
+				if (registeredUser == null) {
+
 					json.put("result", "error");
-					json.put("message","No such user!");
+					json.put("message", "No such user!");
+				} else {
+					registeredUser.sendEmail("forgotpassword");
+					json.put("result", "success");
+					json.put(
+							"message",
+							"An email with your password was sent to "
+									+ ru.get(0));
 				}
-				else{
-				registeredUser.sendEmail("forgotpassword");
-				json.put("result", "success");
-				json.put("message", "An email with your password was sent to "+ru.get(0));
-				}
-				}
+			}
 			/* st */
 			else if (action.equals("Registration")) {
 				String[] str = { "fname", "lname", "email", "password",
@@ -270,19 +342,21 @@ public class Api extends HttpServlet {
 				}
 				if (!stop) {
 					db.addUser((ArrayList) list);
-					ArrayList ru=new ArrayList();
+					ArrayList ru = new ArrayList();
 					ru.add(request.getParameter("email"));
-					User registeredUser=db.getUserByEmail(ru);
+					User registeredUser = db.getUserByEmail(ru);
 					registeredUser.sendEmail("confirmation");
 					json.put("result", "success");
-					json.put("message", "You've been registered, an email was sent to "+ru.get(0));
+					json.put("message",
+							"You've been registered, an email was sent to "
+									+ ru.get(0));
 				}
-			} 
-			/*Ariel search*/
-			
+			}
+			/* Ariel search */
+
 			else if (action.equals("Search")) {
-				String[] str = { "city", "rooms", "price1", "price2",
-						"rooms1", "rooms2" };
+				String[] str = { "city", "rooms", "price1", "price2", "rooms1",
+						"rooms2" };
 
 				boolean stop = false;
 				ArrayList<String> search = new ArrayList<String>();
@@ -310,12 +384,13 @@ public class Api extends HttpServlet {
 				if (!stop) {
 					ArrayList<Apartment> apartments = new ArrayList<Apartment>();
 					apartments = db.getSearchedApartments((ArrayList) list);
-					
+
 				}
-				
+
 			}
-			
-			else { //USER HAVE SESSION? if so httpsession.getAttribute("User"); gets the user object with the data.
+
+			else { // USER HAVE SESSION? if so httpsession.getAttribute("User");
+					// gets the user object with the data.
 				HttpSession httpsession = request.getSession();
 				checkSession(httpsession, request.getParameter("session"));
 				User user = (User) httpsession.getAttribute("User");
@@ -339,16 +414,16 @@ public class Api extends HttpServlet {
 							json.put("result", "error");
 							json.put("message", "No entries found.");
 						}
-					} 
-					else if (action.equals("addHistory")){
-						int apartment_id=Integer.parseInt(request.getParameter("apartment_id"));
+					} else if (action.equals("addHistory")) {
+						int apartment_id = Integer.parseInt(request
+								.getParameter("apartment_id"));
 						user.addHistory(apartment_id);
 						json.put("result", "success");
-					}
-					else if (action.equals("removeHistory")) {
+					} else if (action.equals("removeHistory")) {
 						int aid = 0;
 						try {
-							aid = Integer.parseInt(request.getParameter("apartment_id"));
+							aid = Integer.parseInt(request
+									.getParameter("apartment_id"));
 						} catch (NumberFormatException e) {
 							json.put("result", "error");
 							json.put("message", "apartment_id invalid.");
@@ -356,8 +431,7 @@ public class Api extends HttpServlet {
 						System.out.println(user.getID() + " " + aid);
 						user.removeHistory(aid);
 						json.put("result", "success");
-					}
-					else {
+					} else {
 						throw new Exception();
 					}
 				}
@@ -409,34 +483,37 @@ public class Api extends HttpServlet {
 			JSONObject json_in = new JSONObject();
 			String base64encoded;
 			base64encoded = json_in.getString(request.getParameter("file"));
-			Base64 base64=new Base64();
-			byte[] image=base64.decode(base64encoded);
-			
+			Base64 base64 = new Base64();
+			byte[] image = base64.decode(base64encoded);
+
 			InputStream in = new ByteArrayInputStream(image);
 			BufferedImage bImageFromConvert = ImageIO.read(in);
-			
-			ImageWriter writer = (ImageWriter) ImageIO.getImageWritersByFormatName("jpeg").next();
+
+			ImageWriter writer = (ImageWriter) ImageIO
+					.getImageWritersByFormatName("jpeg").next();
 
 			ImageWriteParam param = writer.getDefaultWriteParam();
 			param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 			param.setCompressionQuality(0.2f);
-			
-			String root=null;
-			String filename=User.md5(String.valueOf(User.epochNow()))+".jpg";
-			String filepath=null;
+
+			String root = null;
+			String filename = User.md5(String.valueOf(User.epochNow()))
+					+ ".jpg";
+			String filepath = null;
 			File file = new File(filepath);
-			ArrayList<String> str=new ArrayList<String>();
+			ArrayList<String> str = new ArrayList<String>();
 			str.add(request.getParameter("apartment_id"));
 			str.add(filename);
 			db.addImagetoApartment(str);
 			writer.setOutput(ImageIO.createImageOutputStream(file));
-			writer.write(null, new IIOImage(bImageFromConvert, null, null), param);
+			writer.write(null, new IIOImage(bImageFromConvert, null, null),
+					param);
 			writer.dispose();
 			json_out.append("result", "success");
-			
+
 		} catch (JSONException e) {
 			e.printStackTrace();
-		} catch (SQLException e){
+		} catch (SQLException e) {
 			try {
 				json_out.append("result", "error");
 			} catch (JSONException e1) {
@@ -445,61 +522,63 @@ public class Api extends HttpServlet {
 		}
 		response.getWriter().println(json_out.toString());
 	}
-	
-	public BufferedImage scale(BufferedImage img, int targetWidth, int targetHeight) {
 
-	    int type = (img.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-	    BufferedImage ret = img;
-	    BufferedImage scratchImage = null;
-	    Graphics2D g2 = null;
+	public BufferedImage scale(BufferedImage img, int targetWidth,
+			int targetHeight) {
 
-	    int w = img.getWidth();
-	    int h = img.getHeight();
+		int type = (img.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB
+				: BufferedImage.TYPE_INT_ARGB;
+		BufferedImage ret = img;
+		BufferedImage scratchImage = null;
+		Graphics2D g2 = null;
 
-	    int prevW = w;
-	    int prevH = h;
+		int w = img.getWidth();
+		int h = img.getHeight();
 
-	    do {
-	        if (w > targetWidth) {
-	            w /= 2;
-	            w = (w < targetWidth) ? targetWidth : w;
-	        }
+		int prevW = w;
+		int prevH = h;
 
-	        if (h > targetHeight) {
-	            h /= 2;
-	            h = (h < targetHeight) ? targetHeight : h;
-	        }
+		do {
+			if (w > targetWidth) {
+				w /= 2;
+				w = (w < targetWidth) ? targetWidth : w;
+			}
 
-	        if (scratchImage == null) {
-	            scratchImage = new BufferedImage(w, h, type);
-	            g2 = scratchImage.createGraphics();
-	        }
+			if (h > targetHeight) {
+				h /= 2;
+				h = (h < targetHeight) ? targetHeight : h;
+			}
 
-	        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-	                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-	        g2.drawImage(ret, 0, 0, w, h, 0, 0, prevW, prevH, null);
+			if (scratchImage == null) {
+				scratchImage = new BufferedImage(w, h, type);
+				g2 = scratchImage.createGraphics();
+			}
 
-	        prevW = w;
-	        prevH = h;
-	        ret = scratchImage;
-	    } while (w != targetWidth || h != targetHeight);
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+					RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g2.drawImage(ret, 0, 0, w, h, 0, 0, prevW, prevH, null);
 
-	    if (g2 != null) {
-	        g2.dispose();
-	    }
+			prevW = w;
+			prevH = h;
+			ret = scratchImage;
+		} while (w != targetWidth || h != targetHeight);
 
-	    if (targetWidth != ret.getWidth() || targetHeight != ret.getHeight()) {
-	        scratchImage = new BufferedImage(targetWidth, targetHeight, type);
-	        g2 = scratchImage.createGraphics();
-	        g2.drawImage(ret, 0, 0, null);
-	        g2.dispose();
-	        ret = scratchImage;
-	    }
+		if (g2 != null) {
+			g2.dispose();
+		}
 
-	    return ret;
+		if (targetWidth != ret.getWidth() || targetHeight != ret.getHeight()) {
+			scratchImage = new BufferedImage(targetWidth, targetHeight, type);
+			g2 = scratchImage.createGraphics();
+			g2.drawImage(ret, 0, 0, null);
+			g2.dispose();
+			ret = scratchImage;
+		}
+
+		return ret;
 
 	}
-	
+
 	private void checkSession(HttpSession httpsession, String session_str) {
 		DB db = new DB();
 		if (httpsession.getAttribute("User") == null) {
