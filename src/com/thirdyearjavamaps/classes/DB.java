@@ -297,8 +297,10 @@ public class DB {
 		close();
 	}
 	/* st */
+	
 	public void addUsersLocations(ArrayList<String> str) throws SQLException {
-		uquery("INSERT INTO Users_Locations (name) VALUES (?)", str);
+		
+		uquery("INSERT INTO Users_Locations (user_id,latitude,longitude,address,name) VALUES (?,?,?,?,?)", str);
 		close();
 	}
 
