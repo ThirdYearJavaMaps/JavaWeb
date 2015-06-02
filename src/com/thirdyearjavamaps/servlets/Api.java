@@ -134,23 +134,28 @@ public class Api extends HttpServlet {
  			}
 	
 			/* st */
-			else if (action.equals("Registration_Buyer")) {
-				String[] strRB = { "name", "address", "latitude", "longitude" };
+			else if (action.equals("Registration_Location")) {
+				
+				String[] strRB = { "userid","lati", "lngi", "addresstosend",  "name"};
+				
 				boolean stop = false;
 				ArrayList<String> ArrayListRB = new ArrayList<String>();
 				for (int i = 0; i < strRB.length; i++) {
+					
 					String param = request.getParameter(strRB[i]);
-					/*
-					 * if (param == null) { json.put("result", "error");
-					 * json.put("message", "Some fields are empty."); stop =
-					 * true; break; }
-					 */
-
+					if (param == null) {
+						json.put("result", "error");
+						json.put("message", "Some fields are empty.");
+						stop = true;
+						break;
+					}
 					ArrayListRB.add(param);
 				}
 				if (!stop) {
-					// db.addLocation(ArrayListRB);
-					json.put("result", "success");
+					
+					 db.addUsersLocations(ArrayListRB);
+					 
+					json.put("result", "Location was written");
 				}
 			}
 			/* st */
