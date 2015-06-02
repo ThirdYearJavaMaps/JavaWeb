@@ -61,6 +61,24 @@ public class Apartment {
     	this.sizem2=sizem2;
     	this.price=price;
     }
+    /*Ariel another constructor*/
+    public Apartment(int id,String city,String address,float rooms,int floor,int price,boolean aircondition, boolean elevator, boolean balcony, boolean isolated_room, boolean parking, boolean handicap_access, boolean storage, boolean sun_balcony){
+    	this.id=id;
+    	this.city=city;
+    	this.address=address;
+    	this.rooms=rooms;
+    	this.floor=floor;
+    	this.price=price;
+    	this.aircondition=aircondition;
+    	this.elevator = elevator;
+        this.balcony = balcony;
+        this.isolated_room = isolated_room;
+        this.parking = parking;
+        this.handicap_access = handicap_access;
+        this.storage = storage;
+        this.sun_balcony = sun_balcony;
+    	
+    }
     public int getId() {
         return id;
     }
