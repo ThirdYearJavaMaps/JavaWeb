@@ -99,6 +99,18 @@ public class DB {
 		close();
 		return true;
 	}
+	
+	/*ar city exists?*/
+	public boolean cityExists(ArrayList<String> str) throws SQLException {
+		res = query("SELECT * FROM Apartments WHERE city=?", str);
+		if (!res.isBeforeFirst()) {
+			close();
+			return false;
+		}
+		close();
+		return true;
+	}
+	
 	/* st and ar*/
 	public User getUserByEmail(ArrayList<String> str) throws SQLException{		
 		res = query("SELECT * FROM Users WHERE email=?", str);		
