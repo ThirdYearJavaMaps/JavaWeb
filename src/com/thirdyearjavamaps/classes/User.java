@@ -243,4 +243,11 @@ public class User {
 	            me.printStackTrace();
 	        }
 	    }
+
+	public List<String> getHistoryListLiked() throws SQLException{
+		DB db = new DB();
+		ArrayList<String> str = new ArrayList<String>();
+		str.add(String.valueOf(id));
+		return (List<String>) db.getHistoryLiked(str);
 	}
+}
