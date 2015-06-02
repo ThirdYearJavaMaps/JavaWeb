@@ -233,7 +233,45 @@ public class Api extends HttpServlet {
 					json.put("result", "success");
 					json.put("message", "You've been registered, an email was sent to "+ru.get(0));
 				}
-			} else { //USER HAVE SESSION? if so httpsession.getAttribute("User"); gets the user object with the data.
+			} 
+			/*Ariel search*/
+			
+			else if (action.equals("Search")) {
+				String[] str = { "city", "rooms", "price1", "price2",
+						"rooms1", "rooms2" };
+
+				boolean stop = false;
+				ArrayList<String> search = new ArrayList<String>();
+				search.add(request.getParameter("city"));
+				if (!db.cityExists(search)) {
+					stop = true;
+					json.put("result", "error");
+					json.put("message",
+							"There are no apartments for sale from this city");
+				}
+				List list = new ArrayList();
+				if (!stop) {
+					for (int i = 0; i < str.length; i++) {
+						String param = request.getParameter(str[i]);
+						if (param == null) {
+							json.put("result", "error");
+							json.put("message", "Some fields are empty.");
+							stop = true;
+							break;
+						}
+
+						list.add(param);
+					}
+				}
+				if (!stop) {
+					ArrayList<Apartment> apartments = new ArrayList<Apartment>();
+					apartments = db.getSearchedApartments((ArrayList) list);
+					
+				}
+				
+			}
+			
+			else { //USER HAVE SESSION? if so httpsession.getAttribute("User"); gets the user object with the data.
 				HttpSession httpsession = request.getSession();
 				checkSession(httpsession, request.getParameter("session"));
 				User user = (User) httpsession.getAttribute("User");
