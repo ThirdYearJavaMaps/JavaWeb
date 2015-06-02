@@ -77,7 +77,17 @@ public class Apartment {
         this.handicap_access = handicap_access;
         this.storage = storage;
         this.sun_balcony = sun_balcony;
-    	
+    	/*Default values for useless parameters*/
+        this.territory ="new";
+        this.bars = true;
+        this.renovated = false;
+        this.furnished = false;
+        this.unit = true;
+        this.pandoor = false;
+        this.longitude = 100;
+        this.latitude = 120;
+        this.sizem2 = 12000;
+        this.desc="desc";
     }
     public int getId() {
         return id;
