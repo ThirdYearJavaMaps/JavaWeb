@@ -182,7 +182,12 @@ public class User {
 		str.add(String.valueOf(id));
 		return (List<String>) db.getHistory(str);
 	}
-	
+	public List<String> getHistoryListLiked() throws SQLException{
+		DB db = new DB();
+		ArrayList<String> str = new ArrayList<String>();
+		str.add(String.valueOf(id));
+		return (List<String>) db.getHistoryLiked(str);
+ 	}
 	public void addHistory(int apartment_id) throws SQLException {
 		DB db = new DB();
 		db.addHistory(id, apartment_id, Long.toString(epochNow()));
