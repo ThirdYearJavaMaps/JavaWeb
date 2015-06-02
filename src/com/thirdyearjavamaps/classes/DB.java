@@ -353,4 +353,41 @@ public class DB {
 
 		return list;
 	}
+		public HashMap getApartmentByID(int apartment_id) throws SQLException {
+ 		c = open();
+ 		c.setAutoCommit(false);
+ 		System.out.println("Opened database successfully");
+		stmt = c.prepareStatement("SELECT * FROM Apartments WHERE id=?");
+ 		stmt.setInt(1,apartment_id);
+ 		res=stmt.executeQuery();
+ 		Apartment apartment=null;
+ 		HashMap row=null;
+ 		ResultSetMetaData md=res.getMetaData();
+ 		int columns =md.getColumnCount();
+ 		while (res.next()) {
+			row = new HashMap(columns);
+ 			for (int i = 1; i <= columns; ++i) {
+ 				row.put(md.getColumnName(i), res.getObject(i));
+ 			}
+ 		}
+ 		close();
+ 		return row;
+ 	}
+
+ 	public HashMap getUserInfo(int user_id) throws SQLException{
+ 		c = open();
+ 		c.setAutoCommit(false);
+ 		System.out.println("Opened database successfully");
+ 		stmt = c.prepareStatement("SELECT phone1,email FROM Users WHERE id=?");
+		stmt.setInt(1,user_id);
+ 		res=stmt.executeQuery();
+ 		HashMap row=new HashMap();
+ 		while(res.next()){
+ 		row.put("phone1",res.getString("phone1"));
+ 		row.put("email",res.getString("email"));
+ 		}
+ 		close();
+ 		return row;
+	}
+
 }
