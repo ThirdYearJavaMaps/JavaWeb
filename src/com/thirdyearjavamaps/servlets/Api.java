@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 
@@ -93,7 +94,45 @@ public class Api extends HttpServlet {
 					json.put("message", "No entries found.");
 				}
 			}
-				
+			
+			 			
+ 			else if(action.equals("getApartment")){
+ 				int apartment_id = Integer.parseInt(request.getParameter("apartment_id"));
+ 				HashMap dict=db.getApartmentByID(apartment_id);
+ 				JSONObject jobj = new JSONObject();
+ 				if (dict!=null) {
+ 					Iterator it = ((Map) dict).entrySet().iterator();
+ 					jobj = new JSONObject();
+ 					while (it.hasNext()) {
+ 						Map.Entry pair = (Map.Entry) it.next();
+ 						jobj.put((String) pair.getKey(), pair.getValue());
+ 						it.remove();
+ 					}
+ 					json.put("result", "success");
+ 					json.put("data", jobj);
+ 				} else {
+ 					json.put("result", "error");
+ 				}
+ 			}
+ 			else if(action.equals("getUserInfo")){
+ 				int user_id = Integer.parseInt(request.getParameter("user_id"));
+ 				HashMap dict=db.getUserInfo(user_id);
+ 				JSONObject jobj = new JSONObject();
+ 				if (dict!=null) {
+ 					Iterator it = ((Map) dict).entrySet().iterator();
+ 					jobj = new JSONObject();
+ 					while (it.hasNext()) {
+ 						Map.Entry pair = (Map.Entry) it.next();
+ 						jobj.put((String) pair.getKey(), pair.getValue());
+ 						it.remove();
+ 					}
+ 					json.put("result", "success");
+ 					json.put("data", jobj);
+ 				} else {
+ 					json.put("result", "error");
+ 				}
+ 			}
+	
 			/* st */
 			else if (action.equals("Registration_Buyer")) {
 				String[] strRB = { "name", "address", "latitude", "longitude" };
