@@ -414,6 +414,16 @@ public class Api extends HttpServlet {
 							json.put("result", "error");
 							json.put("message", "No entries found.");
 						}
+					} else if (action.equals("HistoryLiked")) {
+						List<String> history = user.getHistoryListLiked();
+						if (history != null && history.size() > 0) {
+							JSONArray jarr = ListToJSONArray(history);
+							json.put("result", "success");
+							json.put("data", jarr);
+						} else {
+							json.put("result", "error");
+							json.put("message", "No entries found.");
+						}
 					} else if (action.equals("addHistory")) {
 						int apartment_id = Integer.parseInt(request
 								.getParameter("apartment_id"));
