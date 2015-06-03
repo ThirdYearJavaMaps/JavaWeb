@@ -354,7 +354,7 @@ public class DB {
 		boolean first = true;
 		for (int i = 0; i < words.length; i++) {
 
-			sb.append(" address LIKE %" + words[i] + "% ").append(or);
+			sb.append(" address LIKE '%" + words[i] + "%' ").append(or);
 
 			if (first) {
 				or = " OR ";
@@ -365,8 +365,8 @@ public class DB {
 		c = open();
 		c.setAutoCommit(false);
 		System.out.println("Opened database successfully");
-		stmt = c.prepareStatement("SELECT * FROM Apartments WHERE address LIKE ?");
-		stmt.setString(1, sb.toString());
+		query = "SELECT * FROM Apartments WHERE " + sb.toString();
+		stmt = c.prepareStatement(query);
 		res = stmt.executeQuery();
 		Object o = new ArrayList();
 		o = resultSetToArrayList(res);

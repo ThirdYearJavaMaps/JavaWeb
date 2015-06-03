@@ -116,7 +116,7 @@ public class Api extends HttpServlet {
 				dict.put("furnished", "");
 				dict.put("unit", "");
 				dict.put("pandoor", "");
-				
+
 				for (String item : dict.keySet()) {
 					String param = request.getParameter(item);
 					dict.put(item, param);
@@ -153,9 +153,7 @@ public class Api extends HttpServlet {
 				}
 			} else if (action.equals("SearchAddress")) {
 				json = UtilityTools.SearchApartment(request, json, db);
-			}
-
-			else if (action.equals("getApartment")) {
+			} else if (action.equals("getApartment")) {
 				int apartment_id = Integer.parseInt(request
 						.getParameter("apartment_id"));
 				HashMap dict = db.getApartmentByID(apartment_id);
@@ -339,10 +337,7 @@ public class Api extends HttpServlet {
 							"You've been registered, an email was sent to "
 									+ ru.get(0));
 				}
-			}
-			/* Ariel search */
-
-			else if (action.equals("Search")) {
+			} else if (action.equals("Search")) {
 				String[] str = { "city", "rooms", "price1", "price2", "rooms1",
 						"rooms2" };
 
@@ -375,10 +370,9 @@ public class Api extends HttpServlet {
 
 				}
 
-			}
-
-			else { // USER HAVE SESSION? if so httpsession.getAttribute("User");
-					// gets the user object with the data.
+			} else { // USER HAVE SESSION? if so
+						// httpsession.getAttribute("User");
+						// gets the user object with the data.
 				HttpSession httpsession = request.getSession();
 				checkSession(httpsession, request.getParameter("session"));
 				User user = (User) httpsession.getAttribute("User");
