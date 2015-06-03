@@ -122,27 +122,26 @@ public class Api extends HttpServlet {
 					dict.put(item, param);
 				}
 
-				
-				
-//				
-//				String[] strApt = { "user_id", "type_id", "territory", "city",
-//						"address", "rooms", "floor", "latitude", "longitude",
-//						"sizem2", "comment", "price", "aircondition",
-//						"elevator", "balcony", "isolated_room", "parking",
-//						"handicap_access", "storage", "bars", "sun_balcony",
-//						"renovated", "furnished", "unit", "pandoor" };
+				//
+				// String[] strApt = { "user_id", "type_id", "territory",
+				// "city",
+				// "address", "rooms", "floor", "latitude", "longitude",
+				// "sizem2", "comment", "price", "aircondition",
+				// "elevator", "balcony", "isolated_room", "parking",
+				// "handicap_access", "storage", "bars", "sun_balcony",
+				// "renovated", "furnished", "unit", "pandoor" };
 
 				boolean stop = false;
-				//ArrayList<String> AddApt = new ArrayList<String>();
+				// ArrayList<String> AddApt = new ArrayList<String>();
 				for (String item : dict.keySet()) {
-					//String param = request.getParameter(strApt[i]);
+					// String param = request.getParameter(strApt[i]);
 					if (item == null) {
 						json.put("result", "error");
 						json.put("message", "Some fields are empty.");
 						stop = true;
 						break;
 					}
-					//AddApt.add(param);
+					// AddApt.add(param);
 				}
 
 				if (!stop) {
@@ -153,18 +152,7 @@ public class Api extends HttpServlet {
 
 				}
 			} else if (action.equals("SearchAddress")) {
-				String search = request.getParameter("search");
-				System.out.println(search);
-				List<String> SearchAddress = (List<String>) db
-						.searchAddress(search);
-				if (SearchAddress != null && SearchAddress.size() > 0) {
-					JSONArray jarr = ListToJSONArray(SearchAddress);
-					json.put("result", "success");
-					json.put("data", jarr);
-				} else {
-					json.put("result", "error");
-					json.put("message", "No entries found.");
-				}
+				json = UtilityTools.SearchApartment(request, json, db);
 			}
 
 			else if (action.equals("getApartment")) {

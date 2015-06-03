@@ -329,7 +329,7 @@ public class DB {
 
 	public List getHistory(ArrayList<String> str) throws SQLException {
 		res = query(
-				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE id=History.apartment_id AND id=pic.apartment_id AND Apartments.user_id=?",
+				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE id=History.apartment_id AND id=pic.apartment_id AND History.user_id=?",
 				str);
 		Object o = new ArrayList();
 		o = resultSetToArrayList(res);
@@ -371,15 +371,18 @@ public class DB {
 		close();
 		return (List) o;
 	}
-	public List<String> getHistoryLiked(ArrayList<String> str) throws SQLException{
+
+	public List<String> getHistoryLiked(ArrayList<String> str)
+			throws SQLException {
 		res = query(
-				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=0 AND id=History.apartment_id AND id=pic.apartment_id AND Apartments.user_id=?",
+				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=0 AND id=History.apartment_id AND id=pic.apartment_id AND History.user_id=?",
 				str);
 		Object o = new ArrayList();
 		o = resultSetToArrayList(res);
 		close();
 		return (List) o;
 	}
+
 	public void removeHistory(int user_id, int apartment_id)
 			throws SQLException {
 		uiquery("UPDATE History SET deleted=1 WHERE user_id=? AND apartment_id=?",
@@ -446,12 +449,11 @@ public class DB {
 
 		c = open();
 		c.setAutoCommit(true);
-		
 
 		try {
 			stmt = c.prepareStatement(query);
 			stmt.executeUpdate();
-			
+
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		} finally {
@@ -519,6 +521,79 @@ public class DB {
 				+ ")", null);
 		close();
 	}
+
 	// //////////////////////Api.java /////////////////////////////
 
+	public List searchByAddress(String address) throws SQLException {
+		String[] words = address.replace("%20", " ").split("\\s+");
+		for (int i = 0; i < words.length; i++) {
+			// You may want to check for a non-word character before blindly
+			// performing a replacement
+			// It may also be necessary to adjust the character class
+			words[i] = words[i].replaceAll("[^\\w]|[0-9]", "");
+
+		}
+
+		StringBuilder sb = new StringBuilder();
+		String or = "";
+		boolean first = true;
+		for (int i = 0; i < words.length; i++) {
+			if (words[i].isEmpty()) {
+				continue;
+			}
+			sb.append(or).append(" address LIKE '%" + words[i] + "%' ");
+
+			if (first) {
+				or = " OR ";
+				first = false;
+			}
+		}
+
+		c = open();
+		c.setAutoCommit(false);
+		System.out.println("Opened database successfully");
+
+		query = "SELECT * FROM Apartments WHERE " + sb.toString();
+		System.out.println(query);
+		Object o = null;
+		try {
+			stmt = c.prepareStatement(query);
+			res = stmt.executeQuery();
+			// stmt.setString(1, sb.toString());
+			o = new ArrayList();
+			o = resultSetToArrayList(res);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		} finally {
+			close();
+
+		}
+
+		return (List) o;
+	}
+
+	public List<String> searchByDistance(float lat, float lng, float dst)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void updateApartment(int id, float lat, float lng, String address,
+			String city) throws SQLException {
+		c = open();
+		try {
+			c.setAutoCommit(true);
+			System.out.println("Opened database successfully A");
+			query = "UPDATE Apartments SET city='" + city + "', address='"
+					+ address + "', latitude='" + lat + "', longitude='" + lng
+					+ "' WHERE id='" + id + "'";
+			System.out.println(query);
+			stmt = c.prepareStatement(query);
+
+			stmt.executeUpdate();
+		} catch (Exception e) {
+		} finally {
+			close();
+		}
+	}
 }
