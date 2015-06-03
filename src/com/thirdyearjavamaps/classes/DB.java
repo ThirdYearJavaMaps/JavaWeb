@@ -1,3 +1,5 @@
+
+
 package com.thirdyearjavamaps.classes;
 
 import java.beans.Statement;
@@ -371,9 +373,7 @@ public class DB {
 		close();
 		return (List) o;
 	}
-
-	public List<String> getHistoryLiked(ArrayList<String> str)
-			throws SQLException {
+	public List<String> getHistoryLiked(ArrayList<String> str) throws SQLException{
 		res = query(
 				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=0 AND id=History.apartment_id AND id=pic.apartment_id AND History.user_id=?",
 				str);
@@ -382,7 +382,6 @@ public class DB {
 		close();
 		return (List) o;
 	}
-
 	public void removeHistory(int user_id, int apartment_id)
 			throws SQLException {
 		uiquery("UPDATE History SET deleted=1 WHERE user_id=? AND apartment_id=?",
@@ -449,11 +448,12 @@ public class DB {
 
 		c = open();
 		c.setAutoCommit(true);
+		
 
 		try {
 			stmt = c.prepareStatement(query);
 			stmt.executeUpdate();
-
+			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		} finally {
@@ -521,6 +521,51 @@ public class DB {
 				+ ")", null);
 		close();
 	}
+	
+
+
+//	private void uisquery(String query, ArrayList<String> str)
+//			throws SQLException {
+//
+//		c = open();
+//		c.setAutoCommit(true);
+//
+//		try {
+//			stmt = c.prepareStatement(query);
+//			stmt.executeUpdate();
+//
+//		} catch (Exception e) {
+//			System.out.println(e.getMessage());
+//		} finally {
+//			close();
+//
+//		}
+//	}
+
+//	public void addApt(java.util.Map<String, String> str) throws SQLException {
+//		String params = "";
+//		String values = "'";
+//		String delimp = "";
+//		String delimv = "";
+//		boolean first = true;
+//		for (String item : str.keySet()) {
+//			String val = str.get(item);
+//			if (val == null || val.isEmpty())
+//				continue;
+//			params += delimp + item;
+//			values += delimv + str.get(item);
+//			if (first) {
+//				delimp = ", ";
+//				delimv = "', '";
+//				first = false;
+//			}
+//		}
+//		params += "";
+//		values += "'";
+//		uisquery("INSERT INTO Apartments (" + params + ") VALUES (" + values
+//				+ ")", null);
+//		close();
+//	}
 
 	// //////////////////////Api.java /////////////////////////////
 
