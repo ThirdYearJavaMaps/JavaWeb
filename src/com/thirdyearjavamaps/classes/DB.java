@@ -253,6 +253,7 @@ public class DB {
 		ArrayList<String> str = new ArrayList<String>();
 		str.add(Integer.toString(id));
 		uquery("DELETE FROM Apartment_Picture WHERE apartment_id=?", str);
+		close();
 		uquery("DELETE FROM Apartments WHERE id=?", str);
 		close();
 	}
@@ -499,15 +500,17 @@ public class DB {
 		String delimv = "";
 		boolean first = true;
 		for (String item : str.keySet()) {
-			String val = str.get(item);
-			if (val == null || val.isEmpty())
-				continue;
-			params += delimp + item;
-			values += delimv + str.get(item);
-			if (first) {
-				delimp = ", ";
-				delimv = "', '";
-				first = false;
+			if(!item.equals("image") && !item.equals("action")){
+				String val = str.get(item);
+				if (val == null || val.isEmpty())
+					continue;
+				params += delimp + item;
+				values += delimv + str.get(item);
+				if (first) {
+					delimp = ", ";
+					delimv = "', '";
+					first = false;
+				}
 			}
 		}
 		params += "";
@@ -515,14 +518,17 @@ public class DB {
 		uisquery("INSERT INTO Apartments (" + params + ") VALUES (" + values
 				+ ")", null);
 		res=query1("SELECT last_insert_rowid()");
-		int id=res.getInt(0);
+		close();
+		int id=0;
+		while(res.next())
+			id=res.getInt(0);
 		c = open();
-		c.setAutoCommit(false);
+		c.setAutoCommit(true);
 		System.out.println("Opened database successfully");
 		stmt = c.prepareStatement("INSERT INTO Apartment_Picture VALUES(?,?)");
 		stmt.setInt(1, id);
 		stmt.setString(2, filename);
-		res = stmt.executeQuery();
+		stmt.executeUpdate();
 		close();
 	}
 	
