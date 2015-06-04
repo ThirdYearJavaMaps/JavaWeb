@@ -80,7 +80,7 @@ public class Api extends HttpServlet {
 				}
 
 			}
-
+/*
 			else if (action.equals("AddApt")) {
 				// String[] strApt = { "city","price","territory","street",
 				// "house_num","apt_num","rooms","floor",
@@ -151,7 +151,8 @@ public class Api extends HttpServlet {
 							"You have successfully changed your password ");
 
 				}
-			} else if (action.equals("SearchAddress")) {
+			} */
+			else if (action.equals("SearchAddress")) {
 				json = UtilityTools.SearchApartment(request, json, db);
 			} else if (action.equals("getApartment")) {
 				int apartment_id = Integer.parseInt(request
@@ -469,50 +470,74 @@ public class Api extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		JSONObject json_out = new JSONObject();
+		JSONObject json = new JSONObject();
 		try {
 			DB db = new DB();
-			JSONObject json_in = new JSONObject();
+			JSONObject json_in = new JSONObject(request.getParameter("data"));
 			String base64encoded;
-			base64encoded = json_in.getString(request.getParameter("file"));
+			Map<String, String> dict = new HashMap<>();
+			Iterator it=json_in.keys();
+	        while(it.hasNext()){
+	             String key=(String)it.next();
+	             dict.put(key,(String) json_in.get(key));
+	        }
+	        base64encoded = dict.get("image");
+	        
 			Base64 base64 = new Base64();
 			byte[] image = base64.decode(base64encoded);
 
 			InputStream in = new ByteArrayInputStream(image);
 			BufferedImage bImageFromConvert = ImageIO.read(in);
 
-			ImageWriter writer = (ImageWriter) ImageIO
-					.getImageWritersByFormatName("jpeg").next();
+			ImageWriter writer = (ImageWriter) ImageIO.getImageWritersByFormatName("jpeg").next();
 
 			ImageWriteParam param = writer.getDefaultWriteParam();
 			param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 			param.setCompressionQuality(0.2f);
 
-			String root = null;
-			String filename = User.md5(String.valueOf(User.epochNow()))
-					+ ".jpg";
-			String filepath = null;
+			String root = getServletContext().getRealPath("/");
+			String filename = User.md5(String.valueOf(User.epochNow())) + ".jpg";
+			String filepath = root + "/images/" + filename;
+			System.out.println(filepath);
 			File file = new File(filepath);
-			ArrayList<String> str = new ArrayList<String>();
-			str.add(request.getParameter("apartment_id"));
-			str.add(filename);
-			db.addImagetoApartment(str);
+			
 			writer.setOutput(ImageIO.createImageOutputStream(file));
-			writer.write(null, new IIOImage(bImageFromConvert, null, null),
-					param);
+			writer.write(null, new IIOImage(bImageFromConvert, null, null),param);
 			writer.dispose();
-			json_out.append("result", "success");
+			
+	        boolean stop = false;
+
+			for (String item : dict.keySet()) {
+				if (item == null) {
+					json.put("result", "error");
+					json.put("message", "Some fields are empty.");
+					stop = true;
+					break;
+				}
+
+			}
+
+			if (!stop) {
+					db.addApt(dict,filename);
+					json.put("result", "success");
+					json.put("message",
+							"You have successfully changed your password ");
+
+			}
+			
+
+			json.append("result", "success");
 
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			try {
-				json_out.append("result", "error");
+				json.append("result", "error");
 			} catch (JSONException e1) {
 				e1.printStackTrace();
 			}
 		}
-		response.getWriter().println(json_out.toString());
+		response.getWriter().println(json.toString());
 	}
 
 	public BufferedImage scale(BufferedImage img, int targetWidth,

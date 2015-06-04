@@ -295,11 +295,6 @@ public class DB {
 		close();
 	}
 
-	public void addImagetoApartment(ArrayList<String> str) throws SQLException {
-		uquery("INSERT INTO Apartment_Picture VALUES (?,?)", str);
-		close();
-	}
-
 	/* st */
 
 	public void addUsersLocations(ArrayList<String> str) throws SQLException {
@@ -497,7 +492,7 @@ public class DB {
 	// close();
 	// }
 
-	public void addApt(java.util.Map<String, String> str) throws SQLException {
+	public void addApt(java.util.Map<String, String> str,String filename) throws SQLException {
 		String params = "";
 		String values = "'";
 		String delimp = "";
@@ -519,6 +514,15 @@ public class DB {
 		values += "'";
 		uisquery("INSERT INTO Apartments (" + params + ") VALUES (" + values
 				+ ")", null);
+		res=query1("SELECT last_insert_rowid()");
+		int id=res.getInt(0);
+		c = open();
+		c.setAutoCommit(false);
+		System.out.println("Opened database successfully");
+		stmt = c.prepareStatement("INSERT INTO Apartment_Picture VALUES(?,?)");
+		stmt.setInt(1, id);
+		stmt.setString(2, filename);
+		res = stmt.executeQuery();
 		close();
 	}
 	
