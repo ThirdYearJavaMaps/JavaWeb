@@ -513,19 +513,15 @@ public class Api extends HttpServlet {
 			if (!stop) {
 					db.addApt(dict,filename);
 					json.put("result", "success");
-					json.put("message",
-							"You have successfully changed your password ");
+					json.put("message","You have successfully added an apartment.");
 
 			}
-			
-
-			json.append("result", "success");
 
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			try {
-				json.append("result", "error");
+				json.put("result", "error");
 			} catch (JSONException e1) {
 				e1.printStackTrace();
 			}

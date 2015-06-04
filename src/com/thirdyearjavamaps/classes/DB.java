@@ -515,13 +515,12 @@ public class DB {
 		}
 		params += "";
 		values += "'";
-		uisquery("INSERT INTO Apartments (" + params + ") VALUES (" + values
-				+ ")", null);
-		res=query1("SELECT last_insert_rowid()");
+		uisquery("INSERT INTO Apartments (" + params + ") VALUES (" + values + ")", null);
+		
+		res=query1("SELECT last_insert_rowid();");
+		int id=res.getInt(1);
 		close();
-		int id=0;
-		while(res.next())
-			id=res.getInt(0);
+		
 		c = open();
 		c.setAutoCommit(true);
 		System.out.println("Opened database successfully");
