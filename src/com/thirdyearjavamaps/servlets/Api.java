@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -485,25 +486,17 @@ public class Api extends HttpServlet {
 	        
 			Base64 base64 = new Base64();
 			byte[] image = base64.decode(base64encoded);
-
-			InputStream in = new ByteArrayInputStream(image);
-			BufferedImage bImageFromConvert = ImageIO.read(in);
-
-			ImageWriter writer = (ImageWriter) ImageIO.getImageWritersByFormatName("jpeg").next();
-
-			ImageWriteParam param = writer.getDefaultWriteParam();
-			param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-			param.setCompressionQuality(0.2f);
-
-			String root = getServletContext().getRealPath("/");
+			
+	
+			String root = "/home/guy/git/JavaWeb13/";
 			String filename = User.md5(String.valueOf(User.epochNow())) + ".jpg";
-			String filepath = root + "/images/" + filename;
+			String filepath = root + "images/" + filename;
 			System.out.println(filepath);
 			File file = new File(filepath);
-			
-			writer.setOutput(ImageIO.createImageOutputStream(file));
-			writer.write(null, new IIOImage(bImageFromConvert, null, null),param);
-			writer.dispose();
+			FileOutputStream fos = new FileOutputStream(file);
+			fos.write(image);
+			fos.flush();
+			fos.close();
 			
 	        boolean stop = false;
 
