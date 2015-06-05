@@ -339,9 +339,12 @@ public class Api extends HttpServlet {
 							"You've been registered, an email was sent to "
 									+ ru.get(0));
 				}
-			} else if (action.equals("Search")) {
-				String[] str = { "city", "rooms", "price1", "price2", "rooms1",
-						"rooms2" };
+			}
+			/*Ariel search*/
+			
+			else if (action.equals("Search")) {
+				String[] str = { "city", "rooms", "price1", "price2",
+						"floor1", "floor2" };
 
 				boolean stop = false;
 				ArrayList<String> search = new ArrayList<String>();
@@ -367,12 +370,24 @@ public class Api extends HttpServlet {
 					}
 				}
 				if (!stop) {
-					ArrayList<Apartment> apartments = new ArrayList<Apartment>();
-					apartments = db.getSearchedApartments((ArrayList) list);
-
+					//ArrayList<Apartment> apartments = new ArrayList<Apartment>();
+					//apartments = db.getSearchedApartments((ArrayList) list);
+					
+					List<String> result = (List<String>)db.getSearchedApartments((ArrayList) list);
+					if (result != null && result.size() > 0) {
+						JSONArray jarr = ListToJSONArray(result);
+						json.put("result", "success");
+						json.put("data", jarr);
+					}
+					else {
+						json.put("result", "error");
+						json.put("message", "No entries found.");
+					}
+					
 				}
-
-			} else { // USER HAVE SESSION? if so
+				
+			}
+			else { // USER HAVE SESSION? if so
 						// httpsession.getAttribute("User");
 						// gets the user object with the data.
 				HttpSession httpsession = request.getSession();
