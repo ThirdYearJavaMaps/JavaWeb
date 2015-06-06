@@ -637,7 +637,15 @@ public class DB {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	public void deleteSession(int id) throws SQLException{
+		c = open();
+		c.setAutoCommit(true);
+		System.out.println("Opened database successfully");
+		stmt = c.prepareStatement("UPDATE Users SET session='' WHERE id=?");
+		stmt.setInt(1, id);
+		stmt.executeUpdate();
+		close();
+	}
 	public void updateApartment(int id, float lat, float lng, String address,
 			String city) throws SQLException {
 		c = open();
