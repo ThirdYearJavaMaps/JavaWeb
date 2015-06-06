@@ -502,8 +502,8 @@ public class Api extends HttpServlet {
 			BufferedReader reader = request.getReader();
 			while ((line = reader.readLine()) != null)
 			   jb.append(line);
-			  
-			json_in = new JSONObject(jb.toString());
+			
+			json_in = org.json.HTTP.toJSONObject(jb.toString());
 
 			String base64encoded;
 			Map<String, String> dict = new HashMap<>();
