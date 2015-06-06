@@ -214,29 +214,17 @@ public class DB {
 	
 	public List getSearchedApartments(ArrayList<String> str) throws SQLException {
 		System.out.println(str.toString());
-		res = query("SELECT * FROM Apartments"
-				+ " WHERE lower(city)=lower(?)"
-				+ " AND (rooms=?"
-				+ " OR (price>=? AND price<=?)"
-				+ " OR (floor>=? AND floor<=?))",str);
+		res = query("SELECT * FROM Apartments A"
+				+ " JOIN Apartment_Picture AP ON A.id=AP.apartment_id"
+				+ " AND lower(A.city)=lower(?)"
+				+ " AND (A.rooms=?"
+				+ " OR (A.price>=? AND A.price<=?)"
+				+ " OR (A.floor>=? AND A.floor<=?))",str);
 		if (!res.isBeforeFirst()){
 			
 			close();
 			return null;
 		}
-//		ArrayList<Apartment> apartments = new ArrayList<Apartment>();
-//		for (int i = 0; res.next(); i++) {
-//			Apartment apartment = new Apartment(res.getInt("id"),
-//					res.getString("city"), res.getString("address"),
-//					res.getFloat("rooms"), res.getInt("floor"),
-//					res.getInt("price"),res.getBoolean("aircondition"),
-//					res.getBoolean("elevator"),res.getBoolean("balcony"),
-//					res.getBoolean("isolated_room"),res.getBoolean("parking"),
-//					res.getBoolean("handicap_access"),res.getBoolean("storage"),
-//					res.getBoolean("sun_balcony"));
-//			apartments.add(apartment);
-//		}
-
 		Object o = new ArrayList();
 		o = resultSetToArrayList(res);
 		close();
