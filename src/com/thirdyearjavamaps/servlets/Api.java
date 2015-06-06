@@ -403,6 +403,11 @@ public class Api extends HttpServlet {
 						 * Apartments=Algorithm();
 						 * data=Get_Apartment_Data(Apartments); json.put(data);
 						 */
+					} else if (action.equals("Logout")) {
+							db.deleteSession(user.getID());
+							user.setSession("");
+							json.put("result", "success");
+
 					} else if (action.equals("History")) {
 						List<String> history = user.getHistoryList();
 						if (history != null && history.size() > 0) {
