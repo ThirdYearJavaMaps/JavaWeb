@@ -492,9 +492,18 @@ public class Api extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		JSONObject json = new JSONObject();
+		JSONObject json_in = new JSONObject();
+		DB db = new DB();
 		try {
-			DB db = new DB();
-			JSONObject json_in = new JSONObject(request.getParameter("data"));
+			
+			StringBuffer jb = new StringBuffer();
+			String line = null;
+			BufferedReader reader = request.getReader();
+			while ((line = reader.readLine()) != null)
+			   jb.append(line);
+			  
+			json_in = new JSONObject(jb.toString());
+
 			String base64encoded;
 			Map<String, String> dict = new HashMap<>();
 			Iterator it=json_in.keys();
@@ -549,61 +558,6 @@ public class Api extends HttpServlet {
 		response.getWriter().println(json.toString());
 	}
 
-	public BufferedImage scale(BufferedImage img, int targetWidth,
-			int targetHeight) {
-
-		int type = (img.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB
-				: BufferedImage.TYPE_INT_ARGB;
-		BufferedImage ret = img;
-		BufferedImage scratchImage = null;
-		Graphics2D g2 = null;
-
-		int w = img.getWidth();
-		int h = img.getHeight();
-
-		int prevW = w;
-		int prevH = h;
-
-		do {
-			if (w > targetWidth) {
-				w /= 2;
-				w = (w < targetWidth) ? targetWidth : w;
-			}
-
-			if (h > targetHeight) {
-				h /= 2;
-				h = (h < targetHeight) ? targetHeight : h;
-			}
-
-			if (scratchImage == null) {
-				scratchImage = new BufferedImage(w, h, type);
-				g2 = scratchImage.createGraphics();
-			}
-
-			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-					RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			g2.drawImage(ret, 0, 0, w, h, 0, 0, prevW, prevH, null);
-
-			prevW = w;
-			prevH = h;
-			ret = scratchImage;
-		} while (w != targetWidth || h != targetHeight);
-
-		if (g2 != null) {
-			g2.dispose();
-		}
-
-		if (targetWidth != ret.getWidth() || targetHeight != ret.getHeight()) {
-			scratchImage = new BufferedImage(targetWidth, targetHeight, type);
-			g2 = scratchImage.createGraphics();
-			g2.drawImage(ret, 0, 0, null);
-			g2.dispose();
-			ret = scratchImage;
-		}
-
-		return ret;
-
-	}
 
 	private void checkSession(HttpSession httpsession, String session_str) {
 		DB db = new DB();
