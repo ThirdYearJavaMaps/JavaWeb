@@ -504,21 +504,25 @@ public class Api extends HttpServlet {
 			   jb.append(line);
 			
 			json_in = org.json.HTTP.toJSONObject(jb.toString());
-
+			
+			JSONObject js=new JSONObject((String)json_in.get("Method"));
+			
 			String base64encoded;
 			Map<String, String> dict = new HashMap<>();
-			Iterator it=json_in.keys();
+			Iterator it=js.keys();
 	        while(it.hasNext()){
 	             String key=(String)it.next();
-	             dict.put(key,(String) json_in.get(key));
+	             dict.put(key,(String) js.get(key));
 	        }
+	        
+	        System.out.println(dict);
 	        base64encoded = dict.get("image");
 	        
 			Base64 base64 = new Base64();
 			byte[] image = base64.decode(base64encoded);
 			
 	
-			String root = "/home/guy/git/JavaWeb13/";
+			String root = "/home/guy/git/JavaWeb14/";
 			String filename = User.md5(String.valueOf(User.epochNow())) + ".jpg";
 			String filepath = root + "images/" + filename;
 			System.out.println(filepath);
