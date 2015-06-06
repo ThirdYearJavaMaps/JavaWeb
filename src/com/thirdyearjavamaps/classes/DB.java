@@ -310,7 +310,7 @@ public class DB {
 				str);
 		close();
 	}
-
+//
 	public void addHistory(int user_id, int apartment_id, String date)
 			throws SQLException {
 		c = open();
@@ -649,5 +649,15 @@ public class DB {
 		} finally {
 			close();
 		}
+	}
+
+	public void deleteSession(int id) throws SQLException{
+		c = open();
+		c.setAutoCommit(true);
+		System.out.println("Opened database successfully");
+		stmt = c.prepareStatement("UPDATE Users SET session='' WHERE id=?");
+		stmt.setInt(1, id);
+		stmt.executeUpdate();
+		close();
 	}
 }
