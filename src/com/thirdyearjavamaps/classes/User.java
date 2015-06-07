@@ -182,15 +182,24 @@ public class User {
 		str.add(String.valueOf(id));
 		return (List<String>) db.getHistory(str);
 	}
+	
 	public List<String> getHistoryListLiked() throws SQLException{
 		DB db = new DB();
 		ArrayList<String> str = new ArrayList<String>();
 		str.add(String.valueOf(id));
 		return (List<String>) db.getHistoryLiked(str);
  	}
-	public void addHistory(int apartment_id) throws SQLException {
+	
+	public List<String> getHistoryListNotLiked() throws SQLException{
 		DB db = new DB();
-		db.addHistory(id, apartment_id, Long.toString(epochNow()));
+		ArrayList<String> str = new ArrayList<String>();
+		str.add(String.valueOf(id));
+		return (List<String>) db.getHistoryNotLiked(str);
+ 	}
+	
+	public void addHistory(int apartment_id,int deleted) throws SQLException {
+		DB db = new DB();
+		db.addHistory(id, apartment_id, deleted ,Long.toString(epochNow()));
 	}
 	
 	public void removeHistory(int apartment_id) throws SQLException {

@@ -317,7 +317,7 @@ public class DB {
 		close();
 	}
 
-	public void addHistory(int user_id, int apartment_id, String date)
+	public void addHistory(int user_id, int apartment_id, int deleted ,String date)
 			throws SQLException {
 		c = open();
 		c.setAutoCommit(true);
@@ -325,7 +325,7 @@ public class DB {
 		stmt = c.prepareStatement("INSERT INTO History VALUES (?,?,?,?)");
 		stmt.setInt(1, user_id);
 		stmt.setInt(2, apartment_id);
-		stmt.setInt(3, 0);
+		stmt.setInt(3, deleted);
 		stmt.setString(4, date);
 		stmt.executeUpdate();
 		close();
@@ -384,6 +384,17 @@ public class DB {
 		close();
 		return (List) o;
 	}
+	
+	public List<String> getHistoryNotLiked(ArrayList<String> str) throws SQLException{
+		res = query(
+				"SELECT id,city,address,rooms,price,filename FROM Apartments,History,(select apartment_id,filename from Apartment_Picture GROUP BY apartment_id order by filename) pic WHERE deleted=1 AND id=History.apartment_id AND id=pic.apartment_id AND History.user_id=?",
+				str);
+		Object o = new ArrayList();
+		o = resultSetToArrayList(res);
+		close();
+		return (List) o;
+	}
+	
 	public void removeHistory(int user_id, int apartment_id)
 			throws SQLException {
 		uiquery("UPDATE History SET deleted=1 WHERE user_id=? AND apartment_id=?",
