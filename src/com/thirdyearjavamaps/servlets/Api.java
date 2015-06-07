@@ -82,7 +82,7 @@ public class Api extends HttpServlet {
 				}
 
 			}
-/*
+
 			else if (action.equals("AddApt")) {
 				// String[] strApt = { "city","price","territory","street",
 				// "house_num","apt_num","rooms","floor",
@@ -150,10 +150,10 @@ public class Api extends HttpServlet {
 					db.addApt(dict);
 					json.put("result", "success");
 					json.put("message",
-							"You have successfully changed your password ");
+							"You have registered an apartment. ");
 
 				}
-			} */
+			}
 			else if (action.equals("SearchAddress")) {
 				json = UtilityTools.SearchApartment(request, json, db);
 			} else if (action.equals("getApartment")) {
@@ -492,6 +492,7 @@ public class Api extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		/*
 		JSONObject json = new JSONObject();
 		JSONObject json_in = new JSONObject();
 		DB db = new DB();
@@ -561,6 +562,7 @@ public class Api extends HttpServlet {
 			}
 		}
 		response.getWriter().println(json.toString());
+		*/
 	}
 
 

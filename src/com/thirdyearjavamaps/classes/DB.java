@@ -499,42 +499,25 @@ public class DB {
 	// close();
 	// }
 
-	public void addApt(java.util.Map<String, String> str,String filename) throws SQLException {
+	public void addApt(java.util.Map<String, String> str) throws SQLException {
 		String params = "";
 		String values = "'";
-		String delimp = "";
-		String delimv = "";
+		String delimp = ""; String delimv = "";
 		boolean first = true;
 		for (String item : str.keySet()) {
-			if(!item.equals("image") && !item.equals("action")){
-				String val = str.get(item);
-				if (val == null || val.isEmpty())
-					continue;
-				params += delimp + item;
-				values += delimv + str.get(item);
-				if (first) {
-					delimp = ", ";
-					delimv = "', '";
-					first = false;
-				}
-			}
-		}
+			String val = str.get(item);
+			if (val == null || val.isEmpty()) continue;
+			params += delimp + item;
+			values += delimv + str.get(item);
+			if (first) { 
+				delimp = ", ";
+				delimv = "', '";
+				first = false; 
+			} 
+		} 
 		params += "";
 		values += "'";
-		uisquery("INSERT INTO Apartments (" + params + ") VALUES (" + values + ")", null);
-		
-		res=query1("SELECT last_insert_rowid();");
-		int id=res.getInt(1);
-		close();
-		
-		c = open();
-		c.setAutoCommit(true);
-		System.out.println("Opened database successfully");
-		stmt = c.prepareStatement("INSERT INTO Apartment_Picture VALUES(?,?)");
-		stmt.setInt(1, id);
-		stmt.setString(2, filename);
-		stmt.executeUpdate();
-		close();
+		uisquery("INSERT INTO Apartments (" + params + ") VALUES (" + values + ")", null); close(); 
 	}
 	
 
