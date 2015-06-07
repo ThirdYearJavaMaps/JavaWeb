@@ -350,12 +350,12 @@ public class Api extends HttpServlet {
 				boolean stop = false;
 				ArrayList<String> search = new ArrayList<String>();
 				search.add(request.getParameter("city"));
-				if (!db.cityExists(search)) {
-					stop = true;
-					json.put("result", "error");
-					json.put("message",
-							"There are no apartments for sale from this city");
-				}
+//				if (!db.cityExists(search)) {
+//					stop = true;
+//					json.put("result", "error");
+//					json.put("message",
+//							"There are no apartments for sale from this city");
+//				}
 				List list = new ArrayList();
 				if (!stop) {
 					for (int i = 0; i < str.length; i++) {

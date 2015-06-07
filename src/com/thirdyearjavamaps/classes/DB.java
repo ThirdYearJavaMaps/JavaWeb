@@ -214,12 +214,24 @@ public class DB {
 	
 	public List getSearchedApartments(ArrayList<String> str) throws SQLException {
 		System.out.println(str.toString());
-		res = query("SELECT * FROM Apartments A"
+		c = open();
+		c.setAutoCommit(false);
+		System.out.println("Opened database successfully");
+		query = "SELECT * FROM Apartments A"
 				+ " JOIN Apartment_Picture AP ON A.id=AP.apartment_id"
-				+ " AND lower(A.city)=lower(?)"
+				+ " AND lower(A.city) LIKE lower(?)"
 				+ " AND (A.rooms=?"
 				+ " OR (A.price>=? AND A.price<=?)"
-				+ " OR (A.floor>=? AND A.floor<=?))",str);
+				+ " OR (A.floor>=? AND A.floor<=?))";
+		stmt = c.prepareStatement(query);
+		stmt.setString(1, '%' + str.get(0).toLowerCase() + '%');
+		stmt.setFloat(2, Float.parseFloat(str.get(1)));
+		stmt.setInt(3, Integer.parseInt(str.get(2)));
+		stmt.setInt(4, Integer.parseInt(str.get(3)));
+		stmt.setInt(5, Integer.parseInt(str.get(4)));
+		stmt.setInt(6, Integer.parseInt(str.get(5)));
+
+		res = stmt.executeQuery();
 		if (!res.isBeforeFirst()){
 			
 			close();
